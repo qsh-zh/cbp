@@ -1,0 +1,3 @@
+# CBP
+
+Constrained Belief Propagation
