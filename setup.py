@@ -7,7 +7,7 @@ here = path.abspath(path.dirname(__file__))
 
 # Get the version string
 with open(path.join(here, 'cbp', '__init__.py')) as f:
-    version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
+  version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
 
 setup(
     name='cbp',

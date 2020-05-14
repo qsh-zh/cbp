@@ -29,8 +29,8 @@ jobs:
         pip install ".[dev]"
     - name: pylint
       run: |
-        pylint cbp
-        pylint test
+        pylint --rcfile=pylintrc cbp
+        pylint --rcfile=pylintrc test
     - name: Test with pytest
       run: |
         pytest test --cov cbp --cov-report=xml
