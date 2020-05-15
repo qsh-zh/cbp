@@ -63,7 +63,3 @@ class TestGraph(unittest.TestCase):
             np.array([0.5, 0.5])
         )
         self.assertTrue(all(node_equal))
-
-
-if __name__ == '__main__':
-    unittest.main()

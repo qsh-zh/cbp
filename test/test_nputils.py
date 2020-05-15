@@ -16,7 +16,3 @@ class TestNpUtils(unittest.TestCase):
         ])
         equal = np.isclose(output, target)
         self.assertTrue(equal.all())
-
-
-if __name__ == "__main__":
-    unittest.main()

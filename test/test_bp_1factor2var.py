@@ -47,7 +47,3 @@ class TestGraph(unittest.TestCase):
                                 self.graph.get_node("VarNode_001").marginal(),
                                 atol=1e-3, rtol=1e-2)
         self.assertTrue(all(node_equal))
-
-
-if __name__ == '__main__':
-    unittest.main()

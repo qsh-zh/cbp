@@ -33,7 +33,3 @@ class TestGraph(unittest.TestCase):
         node_equal = np.isclose(np.array([55.0 / 215, 160.0 / 215]),
                                 self.graph.get_node("VarNode_002").bfmarginal)
         self.assertTrue(all(node_equal))
-
-
-if __name__ == '__main__':
-    unittest.main()
