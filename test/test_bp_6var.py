@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from cbp.graph.coef_policy import bp_policy
 
-from .builder_utils import six_node_graph
+from .utils import six_node_graph
 
 
 class TestBpSxiVar(unittest.TestCase):

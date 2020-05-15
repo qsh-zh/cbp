@@ -1,7 +1,7 @@
 import json
 
 import numpy as np
-from cbp.utils.np_utils import expand_ndarray, ndarray_denominator
+from cbp.utils.np_utils import nd_expand, ndarray_denominator
 
 from .base_node import BaseNode
 
@@ -22,8 +22,14 @@ class FactorNode(BaseNode):
         self.hat_c_ialpha = {}
 
         self.i_alpha = {}
+
+        num_connectednode = []
         for item in self.connections:
             self.i_alpha[item] = None
+            num_connectednode.append(int(item[8:]))
+
+        if any(i > j for i, j in zip(num_connectednode, num_connectednode[1:])):
+            raise RuntimeError(f'Set the connection of factor in order')
 
     def check_before_run(self, node_map):
         super().check_before_run(node_map)
@@ -146,7 +152,7 @@ class FactorNode(BaseNode):
         states = message.val
         which_dim = self.connections.index(message.sender.name)
 
-        return expand_ndarray(states, potential_dims, which_dim)
+        return nd_expand(states, potential_dims, which_dim)
 
     def summation(self, potential, node):
         potential_dim = potential.shape

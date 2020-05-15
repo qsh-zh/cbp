@@ -2,7 +2,7 @@ import unittest
 
 from cbp.graph.coef_policy import avg_policy, bp_policy
 
-from .builder_utils import six_node_graph
+from .utils import six_node_graph
 
 
 class TestSetCNPCoef(unittest.TestCase):

@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from .builder_utils import two_node_tree
+from .utils import two_node_tree
 
 
 class TestGraph(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestGraph(unittest.TestCase):
         self.graph = two_node_tree()
 
     def test_sinkhorn_single_0(self):
-        self.graph.varnode_recorder['VarNode_000'].constrainedMarginal \
+        self.graph.varnode_recorder['VarNode_000'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_000'].isconstrained = True
         self.graph.constrained_recorder.append('VarNode_000')
@@ -27,7 +27,7 @@ class TestGraph(unittest.TestCase):
         self.assertTrue(all(node_equal))
 
     def test_sinkhorn_single_1(self):
-        self.graph.varnode_recorder['VarNode_001'].constrainedMarginal \
+        self.graph.varnode_recorder['VarNode_001'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_001'].isconstrained = True
         self.graph.constrained_recorder.append('VarNode_001')
@@ -44,10 +44,10 @@ class TestGraph(unittest.TestCase):
         self.assertTrue(all(node_equal))
 
     def test_sinkhorn_2(self):
-        self.graph.varnode_recorder['VarNode_000'].constrainedMarginal \
+        self.graph.varnode_recorder['VarNode_000'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_000'].isconstrained = True
-        self.graph.varnode_recorder['VarNode_001'].constrainedMarginal \
+        self.graph.varnode_recorder['VarNode_001'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_001'].isconstrained = True
         self.graph.constrained_recorder.append('VarNode_000')

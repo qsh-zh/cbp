@@ -1,7 +1,7 @@
 import json
 
 import numpy as np
-from cbp.utils.np_utils import expand_ndarray
+from cbp.utils.np_utils import nd_expand
 
 from .base_node import BaseNode
 
@@ -87,7 +87,7 @@ class VarNode(BaseNode):
 
         var_index_in_recipient = recipient_node.search_node_index(self.name)
 
-        expanded_first_term = expand_ndarray(
+        expanded_first_term = nd_expand(
             first_term, second_term.shape, var_index_in_recipient)
 
         return np.multiply(expanded_first_term, second_term)

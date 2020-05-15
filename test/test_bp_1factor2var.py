@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from cbp.graph.coef_policy import bp_policy
 
-from .builder_utils import two_node_tree
+from .utils import two_node_tree
 
 
 class TestGraph(unittest.TestCase):

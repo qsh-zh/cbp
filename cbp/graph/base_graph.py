@@ -6,7 +6,7 @@ import numpy as np
 from cbp.node import FactorNode, VarNode
 from cbp.utils import (Message, diff_max_marginals,
                        engine_loop)
-from cbp.utils.np_utils import (expand_ndarray, ndarray_denominator,
+from cbp.utils.np_utils import (nd_expand, ndarray_denominator, nd_multiexpand,
                                 reduction_ndarray)
 
 from .coef_policy import bp_policy
@@ -79,10 +79,11 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             which_dims = [varnode_names.index(v)
                           for v in factor.get_connections()]
             factor_acc = np.ones(var_dim)
-            for joint_coord in np.ndindex(tuple(var_dim)):
-                factor_coord = tuple([joint_coord[i] for i in which_dims])
-                factor_acc[joint_coord] *= factor.potential[factor_coord]
+
+            factor_acc = nd_multiexpand(factor.potential, var_dim, which_dims)
+
             joint_acc *= factor_acc
+
         joint_prob = joint_acc / np.sum(joint_acc)
         return joint_prob
 
@@ -108,7 +109,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             node_instance = self.varnode_recorder[node_name]
             self.sinkhorn_node_coef[node_name] = {
                 'index': varnode_names.index(node_name),
-                'mu': node_instance.constrainedMarginal,
+                'mu': node_instance.constrained_marginal,
                 'u': np.ones(node_instance.rv_dim)
             }
         for node in self.varnode_recorder.values():
@@ -120,7 +121,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         joint_acc = np.ones(var_dim)
 
         for _, recoder in self.sinkhorn_node_coef.items():
-            constrained_acc = expand_ndarray(
+            constrained_acc = nd_expand(
                 recoder['u'], tuple(var_dim), recoder['index'])
             joint_acc *= constrained_acc
 

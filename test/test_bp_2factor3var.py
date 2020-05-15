@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from .builder_utils import three_node_tree
+from .utils import three_node_tree
 
 
 class TestGraph(unittest.TestCase):

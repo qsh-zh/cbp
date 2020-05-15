@@ -54,7 +54,7 @@ def six_node_graph():
     # init factornode
     edges = [
         [0, 1],
-        [2, 1],
+        [1, 2],
         [1, 3],
         [3, 4],
         [3, 5]
@@ -67,3 +67,20 @@ def six_node_graph():
     graph.plot(f"data/six_node_graph.png")
 
     return graph
+
+
+def sinkhorn_bp_equal(graph, len_node, is_debug=False):
+    result = []
+    for i in range(len_node):
+        node_equal = np.isclose(
+            graph.get_node(f'VarNode_{i:03d}').marginal(),
+            graph.get_node(f'VarNode_{i:03d}').sinkhorn,
+            atol=1e-01,
+            rtol=1e-03
+        )
+        if is_debug:
+            print(f"node_{i}")
+            print(graph.get_node(f'VarNode_{i:03d}').marginal())
+            print(graph.get_node(f'VarNode_{i:03d}').sinkhorn)
+        result.append(all(node_equal))
+    return result

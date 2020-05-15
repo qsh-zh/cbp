@@ -1,7 +1,19 @@
 import numpy as np
 
 
-def expand_ndarray(inputdata, target_shape, expand_dim):
+def nd_multiexpand(input_data, target_shape, which_dims):
+    init_shape = [1] * len(target_shape)
+    expand_shape = list(target_shape)
+    for i, cur_dim in enumerate(which_dims):
+        assert input_data.shape[i] == target_shape[cur_dim]
+        init_shape[cur_dim] = target_shape[cur_dim]
+        expand_shape[cur_dim] = 1
+
+    out = input_data.reshape(tuple(init_shape))
+    return np.tile(out, tuple(expand_shape))
+
+
+def nd_expand(inputdata, target_shape, expand_dim):
     """expand ndarray to target shape
 
     :param inputdata:
@@ -21,16 +33,9 @@ def expand_ndarray(inputdata, target_shape, expand_dim):
                 [2,2,2]
             ])
     """
-    assert target_shape[expand_dim] == len(inputdata)
-    init_shape = [1 for i in range(len(target_shape))]
-    init_shape[expand_dim] = target_shape[expand_dim]
-    out = np.array(inputdata).reshape(tuple(init_shape))
-
-    outshape_list = list(target_shape)
-    outshape_list[expand_dim] = 1
-
-    outshape = tuple(outshape_list)
-    return np.tile(out, outshape)
+    in_ = np.array(inputdata)
+    dims = [expand_dim]
+    return nd_multiexpand(in_, target_shape, dims)
 
 
 def reduction_ndarray(ndarray, reduction_index):

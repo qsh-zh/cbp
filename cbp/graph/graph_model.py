@@ -83,13 +83,13 @@ class GraphModel(BaseGraph):
         self.iterative_scaling_outer_cnt %= len(self.constrained_nodes)
 
     def its_next_looplink(self):
-        self.iterative_scaling_outer_counting()
         target_node = self.constrained_nodes[self.iterative_scaling_outer_cnt]
         # target_node.sendout_message()
 
         next_node = self.constrained_nodes[(
             self.iterative_scaling_outer_cnt + 1) % len(self.constrained_nodes)]
 
+        self.iterative_scaling_outer_counting()
         return target_node, find_link(target_node, next_node)
 
     def iterative_scaling_outer_loop(self):
