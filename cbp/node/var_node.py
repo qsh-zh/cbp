@@ -76,7 +76,8 @@ class VarNode(BaseNode):
         return np.exp(log_base)
 
     def make_message_bp(self, recipient_node):
-        assert self.coef_ready, f"{self.name} need to cal_cnp_coef by graph firstly"
+        assert self.coef_ready,\
+            f"{self.name} need to cal_cnp_coef by graph firstly"
         # first_term.shape equals (self.rv_dim,)
         first_term = self._make_message_first_term(recipient_node)
         assert first_term.shape[0] == self.rv_dim
@@ -112,7 +113,8 @@ class VarNode(BaseNode):
             'name': self.name,
             'potential': self.potential.tolist(),
             'node_coef': self.node_coef,
-            'constraine_marginal': self.constrained_marginal.tolist() if self.isconstrained else None,
+            'constraine_marginal':
+            self.constrained_marginal.tolist() if self.isconstrained else None,
             'connections': self.connections
         }, separators=separators, indent=indent)
 

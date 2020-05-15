@@ -4,23 +4,20 @@ from functools import partial
 
 import numpy as np
 from cbp.node import FactorNode, VarNode
-from cbp.utils import (Message, compare_marginals, diff_max_marginals,
-                       engine_loop, np_utils)
+from cbp.utils import (Message, diff_max_marginals,
+                       engine_loop)
 from cbp.utils.np_utils import (expand_ndarray, ndarray_denominator,
                                 reduction_ndarray)
 
-from .coef_policy import *
+from .coef_policy import bp_policy
 
 try:
-    import pygraphviz
-    import tempfile
-    import matplotlib
-    import matplotlib.pyplot as plt
+    import pygraphviz  # noqa
 except BaseException:
     pygraphviz = None
 
 
-class BaseGraph(object):
+class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
         self.varnode_recorder = {}
         self.constrained_recorder = []
@@ -113,7 +110,7 @@ class BaseGraph(object):
 
     def init_sinkhorn_node(self):
         varnode_names = list(self.varnode_recorder.keys())
-        self.sinkhorn_node_coef = {}
+        self.sinkhorn_node_coef = {}  # pylint: disable=attribute-defined-outside-init
         for node_name in self.constrained_recorder:
             node_instance = self.varnode_recorder[node_name]
             self.sinkhorn_node_coef[node_name] = {
@@ -129,7 +126,7 @@ class BaseGraph(object):
         var_dim = [variable.rv_dim for variable in varnodes]
         joint_acc = np.ones(var_dim)
 
-        for name, recoder in self.sinkhorn_node_coef.items():
+        for _, recoder in self.sinkhorn_node_coef.items():
             constrained_acc = expand_ndarray(
                 recoder['u'], tuple(var_dim), recoder['index'])
             joint_acc *= constrained_acc
@@ -139,9 +136,8 @@ class BaseGraph(object):
 
     # TODO this is a bug!!!!
     def sinkhorn_update(self, tilde_c):
-        for node_name, recorder in self.sinkhorn_node_coef.items():
+        for _, recorder in self.sinkhorn_node_coef.items():
             big_u = self.build_big_u()
-            length_var = len(self.varnode_recorder)
             normalized_denominator = (big_u * tilde_c) / \
                 np.sum(big_u * tilde_c)
 
@@ -192,39 +188,12 @@ class BaseGraph(object):
         node.is_traversed = False
 
     def init_node_recorder(self):
-        factors = [node for node in self.factornode_recorder.values()]
-        variables = [node for node in self.varnode_recorder.values()]
+        factors = list(self.factornode_recorder.values())
+        variables = list(self.varnode_recorder.values())
         # in Norm-Product, run factor message first
-        self.nodes = factors + variables
-        self.constrained_nodes = [self.varnode_recorder[name]
+        self.nodes = factors + variables  # pylint: disable=attribute-defined-outside-init
+        self.constrained_nodes = [self.varnode_recorder[name]  # pylint: disable=attribute-defined-outside-init
                                   for name in self.constrained_recorder]
-
-    def two_pass(self):
-        self.init_cnp_coef()
-        self.first_belief_propagation()
-        for node in self.nodes:
-            node.marked = False
-
-        for node in self.nodes:
-            if len(node.connections) == 1:
-                root_node = node
-
-        self.send_from(root_node)
-        self.send_out(root_node)
-
-    def send_from(self, node):
-        node.marked = True
-        for cur_node in node.connected_nodes.values():
-            if not cur_node.marked:
-                self.send_from(cur_node)
-                cur_node.send_message(node)
-
-    def send_out(self, node):
-        node.marked = False
-        for cur_node in node.connected_nodes.values():
-            if cur_node.marked:
-                node.send_message(cur_node)
-                self.send_out(cur_node)
 
     def get_node(self, name_str):
         if name_str not in self.node_recorder:
@@ -293,8 +262,10 @@ class BaseGraph(object):
     def to_json(self, separators=(',', ':'), indent=4):
         return json.dumps({
             'class': 'GraphModel',
-            'varnodes': [json.loads(node.to_json()) for node in self.varnode_recorder.values()],
-            'factornodes': [json.loads(node.to_json()) for node in self.factornode_recorder.values()],
+            'varnodes': [json.loads(node.to_json())
+                         for node in self.varnode_recorder.values()],
+            'factornodes': [json.loads(node.to_json())
+                            for node in self.factornode_recorder.values()],
         }, separators=separators, indent=indent)
 
     @classmethod
@@ -303,7 +274,8 @@ class BaseGraph(object):
 
         if d_context['class'] != 'GraphModel':
             raise IOError(
-                f"Need a GraphModel class json to construct GraphModel instead of {d_context['class']}")
+                f"Need a GraphModel class json to construct GraphModel\
+                     instead of {d_context['class']}")
         varnodes = [VarNode.from_json(json.dumps(info))
                     for info in d_context['varnodes']]
         factornodes = [
@@ -329,7 +301,8 @@ class BaseGraph(object):
             flag.append(self.constrained_recorder == value.constrained_recorder)
             for factornode_name in self.factornode_recorder.keys():
                 flag.append(
-                    self.factornode_recorder[factornode_name] == value.factornode_recorder[factornode_name])
+                    self.factornode_recorder[factornode_name]
+                    == value.factornode_recorder[factornode_name])
             if np.sum(flag) == len(flag):
                 return True
 

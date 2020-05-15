@@ -1,18 +1,16 @@
 from functools import partial
 
-import numpy as np
-from cbp.node import FactorNode, VarNode
-from cbp.utils import (Message, compare_marginals, diff_max_marginals,
+from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop)
-from cbp.utils.np_utils import expand_ndarray, reduction_ndarray
 
 from .base_graph import BaseGraph
-from .coef_policy import *
+from .coef_policy import bp_policy
 
 
 class GraphModel(BaseGraph):
     def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
         super().__init__(silent=silent, epsilon=epsilon, coef_policy=coef_policy)
+        self.iterative_scaling_outer_cnt = 0
 
     def init_cnp_coef(self):
         for node in self.nodes:
@@ -76,10 +74,7 @@ class GraphModel(BaseGraph):
                                 isoutput=False)
 
     def iterative_scaling_outer_counting(self):
-        try:
-            self.iterative_scaling_outer_cnt += 1
-        except AttributeError:
-            self.iterative_scaling_outer_cnt = 0
+        self.iterative_scaling_outer_cnt += 1
 
         self.iterative_scaling_outer_cnt %= len(self.constrained_nodes)
 
@@ -95,7 +90,7 @@ class GraphModel(BaseGraph):
 
     def iterative_scaling_outer_loop(self):
         for _ in range(len(self.constrained_nodes)):
-            cur_node, loop_link = self.its_next_looplink()
+            _, loop_link = self.its_next_looplink()
             inner_fun = partial(self.iterative_scaling_inner_loop, loop_link)
 
             self.engine_loop(inner_fun,
@@ -142,11 +137,35 @@ class GraphModel(BaseGraph):
 
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():
-            connected_factor_names = target_var.connections
-            connected_factor = [self.node_recorder[name]
-                                for name in connected_factor_names]
             # sendind in messages from factors
             target_var.sendin_message(self.silent)
 
             if run_constrained or (not target_var.isconstrained):
                 target_var.sendout_message(self.silent)
+
+    def two_pass(self):
+        self.init_cnp_coef()
+        self.first_belief_propagation()
+        for node in self.nodes:
+            node.marked = False
+
+        for node in self.nodes:
+            if len(node.connections) == 1:
+                root_node = node
+
+        self.send_from(root_node)
+        self.send_out(root_node)
+
+    def send_from(self, node):
+        node.marked = True
+        for cur_node in node.connected_nodes.values():
+            if not cur_node.marked:
+                self.send_from(cur_node)
+                cur_node.send_message(node)
+
+    def send_out(self, node):
+        node.marked = False
+        for cur_node in node.connected_nodes.values():
+            if cur_node.marked:
+                node.send_message(cur_node)
+                self.send_out(cur_node)

@@ -33,9 +33,9 @@ class FactorNode(BaseNode):
         for i, varnode_name in enumerate(self.connections):
             varnode = node_map[varnode_name]
             assert self.potential.shape[i] == varnode.rv_dim, \
-                f"Dimention mismatch! At {i:02d} axis, \
-                    rv_dim:{varnode.rv_dim:02d}, potential: {self.potential.shape[i]}\
-                        in Factor:{self.name}"
+                f"Dimention mismatch! At {i:02d} axis in Factor:{self.name} \
+                    rv_dim:{varnode.rv_dim:02d}, \
+                    potential: {self.potential.shape[i]}"
             self.last_innerparenthese_msg[varnode_name] = np.ones(
                 self.potential.shape)
 

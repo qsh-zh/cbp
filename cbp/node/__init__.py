@@ -4,6 +4,6 @@ from cbp.node.factor_node import FactorNode
 
 __all__ = [
     "BaseNode",
-    "VarNode"
+    "VarNode",
     "FactorNode"
 ]

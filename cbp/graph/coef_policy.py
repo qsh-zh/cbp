@@ -1,7 +1,4 @@
-import numpy as np
-
-
-def avg_policy(node, node_map):
+def avg_policy(node, node_map):  # pylint: disable=unused-argument
     return 1.0 / len(node_map)
 
 
@@ -23,7 +20,7 @@ def factor_policy(node, node_map):
     return coef
 
 
-def bp_policy(node, node_map):
+def bp_policy(node, node_map):  # pylint: disable=unused-argument
     if node.__class__.__name__ == 'VarNode':
         coef = 1.0 - len(node.connections)
     elif node.__class__.__name__ == 'FactorNode':
