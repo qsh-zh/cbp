@@ -1,7 +1,7 @@
 import unittest
 
 import numpy as np
-from cbp.np_utils import expand_ndarray
+from cbp.utils.np_utils import expand_ndarray
 
 
 class TestNpUtils(unittest.TestCase):
