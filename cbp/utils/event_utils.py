@@ -3,14 +3,14 @@ import time
 import numpy as np
 
 
-def engine_loop(
+def engine_loop(  # pylint: disable=too-many-arguments
         engine_fun,
         max_iter=5000000,
         tolerance=1e-2,
         error_fun=None,
         meassure_fun=None,
         isoutput=False,
-        silent=False):  # pylint: disable=too-many-arguments
+        silent=False):
     check_step = 1
     epsilons = [np.inf] * check_step
     start = time.time()

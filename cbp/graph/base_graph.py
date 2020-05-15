@@ -10,7 +10,7 @@ from cbp.utils.np_utils import (expand_ndarray, ndarray_denominator,
                                 reduction_ndarray)
 
 from .coef_policy import bp_policy
-
+from .graph_utils import cal_marginal_from_tensor
 try:
     import pygraphviz  # noqa
 except BaseException:
@@ -90,7 +90,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         varnodes = list(self.varnode_recorder.values())
         prob_tensor = self.pmf()
 
-        marginal_list = self.cal_marginal_from_tensor(prob_tensor, varnodes)
+        marginal_list = cal_marginal_from_tensor(prob_tensor, varnodes)
         for node, marginal in zip(varnodes, marginal_list):
             node.bfmarginal = marginal
 
@@ -100,13 +100,6 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
                 val = node.make_init_message(recipient_name)
                 message = Message(node, val)
                 self.node_recorder[recipient_name].store_message(message)
-
-    @staticmethod
-    def cal_marginal_from_tensor(prob_tensor, varnode_list):
-        rtn_marginal = []
-        for i, _ in enumerate(varnode_list):
-            rtn_marginal.append(reduction_ndarray(prob_tensor, i))
-        return rtn_marginal
 
     def init_sinkhorn_node(self):
         varnode_names = list(self.varnode_recorder.keys())
@@ -121,7 +114,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         for node in self.varnode_recorder.values():
             node.sinkhorn = np.ones(node.rv_dim) / node.rv_dim
 
-    def build_big_u(self):
+    def __build_big_u(self):
         varnodes = list(self.varnode_recorder.values())
         var_dim = [variable.rv_dim for variable in varnodes]
         joint_acc = np.ones(var_dim)
@@ -137,7 +130,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     # TODO this is a bug!!!!
     def sinkhorn_update(self, tilde_c):
         for _, recorder in self.sinkhorn_node_coef.items():
-            big_u = self.build_big_u()
+            big_u = self.__build_big_u()
             normalized_denominator = (big_u * tilde_c) / \
                 np.sum(big_u * tilde_c)
 
@@ -147,7 +140,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             recorder['u'] = recorder['u'] * recorder['mu'] / copy_denominator
 
         varnodes = list(self.varnode_recorder.values())
-        marginal_list = self.cal_marginal_from_tensor(
+        marginal_list = cal_marginal_from_tensor(
             normalized_denominator, varnodes)
         for node, marginal in zip(varnodes, marginal_list):
             node.sinkhorn = marginal
@@ -214,11 +207,11 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
 
             # clear map
             if len(connected_node.get_connections()) == 0:
-                self._delete_node_recorder(connected_node)
+                self.__delete_node_recorder(connected_node)
 
-        self._delete_node_recorder(target_node)
+        self.__delete_node_recorder(target_node)
 
-    def _delete_node_recorder(self, node):
+    def __delete_node_recorder(self, node):
         target_map = self.varnode_recorder if isinstance(
             node, VarNode) else self.factornode_recorder
         del target_map[node.name]
@@ -227,23 +220,21 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             self.constrained_recorder.remove(node.name)
 
     def export_marginals(self):
-        return dict([
-            (n.name, n.marginal()) for n in self.varnode_recorder.values()
-        ])
+        return {
+            n.name: n.marginal() for n in self.varnode_recorder.values()
+        }
 
     def export_convergence_marginals(self):
-        return dict([
-            (n.name, n.marginal()) for n in self.nodes
-        ])
+        return {n.name: n.marginal() for n in self.nodes}
 
     def export_sinkhorn(self):
-        return dict([(node_name, node.sinkhorn)
-                     for node_name, node in self.varnode_recorder.items()])
+        return {node_name: node.sinkhorn
+                for node_name, node in self.varnode_recorder.items()}
 
     def plot(self, png_name='file.png'):
         if pygraphviz is not None:
             graph = pygraphviz.AGraph(directed=False)
-            for varnode_name in self.varnode_recorder.keys():
+            for varnode_name in self.varnode_recorder:
                 if varnode_name in self.constrained_recorder:
                     graph.add_node(varnode_name, color='red', style='filled')
                 else:
@@ -295,11 +286,11 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def __eq__(self, value):
         if isinstance(value, type(self)):
             flag = []
-            for varnode_name in self.varnode_recorder.keys():
+            for varnode_name in self.varnode_recorder:
                 flag.append(
                     self.varnode_recorder[varnode_name] == value.varnode_recorder[varnode_name])
             flag.append(self.constrained_recorder == value.constrained_recorder)
-            for factornode_name in self.factornode_recorder.keys():
+            for factornode_name in self.factornode_recorder:
                 flag.append(
                     self.factornode_recorder[factornode_name]
                     == value.factornode_recorder[factornode_name])

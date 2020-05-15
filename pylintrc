@@ -62,7 +62,8 @@ confidence=
 # --disable=W"
 disable=
     # disabled by me,
-    locally-disabled,
+    # locally-disabled,
+    comparison-with-callable,
     missing-docstring,
     fixme,
     # disabled by default,

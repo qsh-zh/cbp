@@ -5,6 +5,7 @@ from cbp.utils import (compare_marginals, diff_max_marginals,
 
 from .base_graph import BaseGraph
 from .coef_policy import bp_policy
+from .graph_utils import iterative_scaling_inner_loop, find_link
 
 
 class GraphModel(BaseGraph):
@@ -29,15 +30,18 @@ class GraphModel(BaseGraph):
         return algo()
 
     def norm_product_bp(self, max_iter=5000000, tolerance=1e-5, error_fun=None):
+        if error_fun is None:
+            error_fun = diff_max_marginals
         self.init_cnp_coef()
         self.first_belief_propagation()
         return self.engine_loop(
+            max_iter=max_iter,
             engine_fun=self.parallel_message,
-            tolerance=1e-4,
-            error_fun=diff_max_marginals,
+            tolerance=tolerance,
+            error_fun=error_fun,
             isoutput=False)
 
-    def engine_loop(
+    def engine_loop(  # pylint: disable= too-many-arguments
             self,
             engine_fun,
             max_iter=5000000,
@@ -86,54 +90,17 @@ class GraphModel(BaseGraph):
         next_node = self.constrained_nodes[(
             self.iterative_scaling_outer_cnt + 1) % len(self.constrained_nodes)]
 
-        return target_node, self.find_link(target_node, next_node)
+        return target_node, find_link(target_node, next_node)
 
     def iterative_scaling_outer_loop(self):
         for _ in range(len(self.constrained_nodes)):
             _, loop_link = self.its_next_looplink()
-            inner_fun = partial(self.iterative_scaling_inner_loop, loop_link)
+            inner_fun = partial(iterative_scaling_inner_loop, loop_link)
 
             self.engine_loop(inner_fun,
                              tolerance=1e-2,
                              error_fun=diff_max_marginals,
                              isoutput=False)
-
-    def iterative_scaling_inner_loop(self, loop_link):
-        if len(loop_link) == 2:
-            return
-
-        for sender, reciever in zip(loop_link[0:-1], loop_link[1:]):
-            sender.send_message(reciever)
-
-        loop_link.reverse()
-        for sender, reciever in zip(loop_link[0:-1], loop_link[1:]):
-            sender.send_message(reciever)
-
-    def find_link(self, node_a, node_b):
-        a_2root = self.get_node2root(node_a)
-        b_2root = self.get_node2root(node_b)
-        while (len(b_2root) > 1 and len(a_2root) > 1):
-            if b_2root[-1] == a_2root[-1] and b_2root[-2] == a_2root[-2]:
-                b_2root.pop()
-                a_2root.pop()
-            else:
-                break
-        b_2root.reverse()
-        if len(b_2root) >= 2:
-            return a_2root + b_2root[1:]
-        else:
-            return a_2root[:-1] + b_2root[:]
-
-    def get_node2root(self, node):
-        rtn = []
-        tmp = node
-        while True:
-            rtn.append(tmp)
-            tmp = tmp.parent
-            if not tmp:
-                break
-
-        return rtn
 
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():
