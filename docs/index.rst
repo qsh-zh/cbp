@@ -7,6 +7,7 @@ Welcome to CBP!
 ===============================
 
 **CBP** (Constrained Belief Propagation) is package for Bayesian Inference with some known marginal information.
+More details on :cite:`SigHaaZha20` work
 
 .. toctree::
    :maxdepth: 1
@@ -22,3 +23,8 @@ Welcome to CBP!
    api/cbp.graph
    api/cbp.node
    api/cbp.utils
+
+.. rubric:: References
+
+.. bibliography:: /refs.bib
+    :style: unsrtalpha
