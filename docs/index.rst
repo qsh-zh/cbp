@@ -7,15 +7,10 @@ Welcome to cbp's documentation!
 ===============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: API Docs
 
-   api/cbp
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api/cbp.builder
+   api/cbp.graph
+   api/cbp.node
+   api/cbp.utils
