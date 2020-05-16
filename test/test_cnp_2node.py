@@ -14,7 +14,7 @@ class TestGraph(unittest.TestCase):
             = np.array([0.5, 0.5])
         self.graph.get_node('VarNode_000').isconstrained = True
         self.graph.constrained_recorder.append('VarNode_000')
-        self.graph.belif_p()
+        self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_001').marginal(),
             np.array([0.375, 0.625])
@@ -31,7 +31,7 @@ class TestGraph(unittest.TestCase):
             = np.array([0.5, 0.5])
         self.graph.get_node('VarNode_001').isconstrained = True
         self.graph.constrained_recorder.append('VarNode_001')
-        self.graph.belif_p()
+        self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_001').marginal(),
             np.array([0.5, 0.5])
@@ -52,7 +52,7 @@ class TestGraph(unittest.TestCase):
         self.graph.get_node('VarNode_001').isconstrained = True
         self.graph.constrained_recorder.append('VarNode_000')
         self.graph.constrained_recorder.append('VarNode_001')
-        self.graph.belif_p()
+        self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_000').marginal(),
             np.array([0.5, 0.5])

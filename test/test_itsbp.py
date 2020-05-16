@@ -54,7 +54,7 @@ class TestITSbp(unittest.TestCase):
             num_node = int(np.random.randint(3, 10))
             node_dim = int(np.random.randint(2, 5))
             self.graph = LineBuilder(num_node, node_dim, bp_policy)()
-            self.graph.belif_p(self.graph.iterative_scaling)
+            self.graph.run_bp(self.graph.iterative_scaling)
             self.graph.sinkhorn()
             self.assertTrue(
                 all(sinkhorn_bp_equal(self.graph, len_node=num_node)))
@@ -66,7 +66,7 @@ class TestITSbp(unittest.TestCase):
             self.graph = HMMBuilder(num_node, node_dim, bp_policy)()
             self.graph.sinkhorn()
             print(f"{i}-th test, run {node_dim} status with {num_node} nodes")
-            self.graph.belif_p(self.graph.iterative_scaling)
+            self.graph.run_bp(self.graph.iterative_scaling)
             self.assertTrue(
                 all(sinkhorn_bp_equal(self.graph, len_node=num_node)))
 
@@ -74,7 +74,7 @@ class TestITSbp(unittest.TestCase):
     def test_zero_hmm(self):
         graph = HMMZeroBuilder(3, 3, bp_policy)()
         graph.sinkhorn()
-        graph.belif_p(graph.iterative_scaling)
+        graph.run_bp(graph.iterative_scaling)
         self.assertTrue(
             all(sinkhorn_bp_equal(graph, len_node=3)))
 

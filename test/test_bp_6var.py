@@ -12,7 +12,7 @@ class TestBpSxiVar(unittest.TestCase):
 
     def test_marginal_bp(self):
         self.graph.coef_policy = bp_policy
-        self.graph.belif_p()
+        self.graph.run_bp()
         self.graph.exact_marginal()
 
         isequal_list = []

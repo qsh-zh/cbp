@@ -28,7 +28,7 @@ class TestGraph(unittest.TestCase):
         self.assertTrue(all(node_equal))
 
     def test_marginal_bp(self):
-        self.graph.belif_p()
+        self.graph.run_bp()
         node_equal = np.isclose(
             np.array([0.6, 0.4]),
             self.graph.get_node("VarNode_000").marginal())

@@ -19,7 +19,7 @@ class GraphModel(BaseGraph):
             node.cal_cnp_coef()
 
     # decay interface
-    def belif_p(self, algo=None):
+    def run_bp(self, algo=None):
         if algo is None:
             algo = self.norm_product_bp
         elif algo == self.iterative_scaling:

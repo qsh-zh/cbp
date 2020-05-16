@@ -10,7 +10,7 @@ class TestGraph(unittest.TestCase):
         self.graph = three_node_tree()
 
     def test_marginal_bp(self):
-        self.graph.belif_p()
+        self.graph.run_bp()
         self.graph.exact_marginal()
 
         isequal_list = []
