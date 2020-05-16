@@ -45,7 +45,10 @@ setup(
     install_requires=[
         'numpy',
         'tqdm',
-        'matplotlib'
+        'scipy',
+        'matplotlib',
+        'seaborn',
+        'pygraphviz'
     ],
     extras_require={
         'dev': [
