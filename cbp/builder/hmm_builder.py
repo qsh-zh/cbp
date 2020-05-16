@@ -2,9 +2,9 @@ from .base_builder import BaseBuilder
 
 
 class HMMBuilder(BaseBuilder):
-    def __init__(self, length, d, policy, rand_seed=1):
+    def __init__(self, length, node_dim, policy, rand_seed=1):
         self.hmm_length = length
-        super().__init__(d, policy, rand_seed)
+        super().__init__(node_dim, policy, rand_seed)
 
     def step(self, time_stamp):
         """hmm go forward a step, time + 1

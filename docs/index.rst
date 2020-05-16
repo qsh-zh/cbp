@@ -3,8 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to cbp's documentation!
+Welcome to CBP!
 ===============================
+
+**CBP** (Constrained Belief Propagation) is package for Bayesian Inference with some known marginal information.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Quick start guide
+
+   tutorial/start
 
 .. toctree::
    :maxdepth: 1
