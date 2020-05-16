@@ -7,7 +7,7 @@ here = path.abspath(path.dirname(__file__))
 
 # Get the version string
 with open(path.join(here, 'cbp', '__init__.py')) as f:
-  version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
+    version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
 
 setup(
     name='cbp',
@@ -17,7 +17,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/zqsh/cbp',
     author='Qinsheng',
-    author_email='zqsh.27@gatech.edu',
+    author_email='zqsh.27@google.com',
     license='MIT',
     python_requires='>=3.6',
     classifiers=[
