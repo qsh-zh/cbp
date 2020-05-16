@@ -25,4 +25,6 @@ python:
         path: .
       - method: setuptools
         path: .
+        extra_requirements:
+         - dev
 
