@@ -149,7 +149,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def check_sinkhorn(self):
         if len(self.constrained_recorder) == 0:
             raise RuntimeError(
-                f"There is no constrained nodes, use brutal force")
+                "There is no constrained nodes, use brutal force")
 
     def sinkhorn(self, max_iter=5000000, tolerance=1e-5):
         self.check_sinkhorn()
