@@ -30,8 +30,7 @@ jobs:
         pip install ".[dev]"
     - name: pylint
       run: |
-        pylint --rcfile=pylintrc cbp
-        pylint --rcfile=pylintrc test
+        pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy cbp
     - name: Test with pytest
       run: |
         pytest test --cov cbp --cov-report=xml

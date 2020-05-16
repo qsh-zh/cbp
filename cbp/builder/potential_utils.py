@@ -6,15 +6,15 @@ def diagonal_potential(d_1: int, d_2: int,
                        rng: np.random.RandomState) -> np.ndarray:
     factor_potential = rng.randint(4, 6, size=(d_1, d_2)) * 1.0
     dim = np.min([d_1, d_2])
-    I = np.eye(dim)
+    identity = np.eye(dim)
     if rng.normal(size=1) > 1:
-        I = np.flip(I, axis=0)
+        identity = np.flip(identity, axis=0)
     if d_2 > d_1:
-        diagonal = np.concatenate([I, np.zeros(dim, d_2 - dim)], axis=1)
+        diagonal = np.concatenate([identity, np.zeros(dim, d_2 - dim)], axis=1)
     elif d_2 < d_1:
-        diagonal = np.concatenate([I, np.zeros(d_1 - dim, dim)], axis=0)
+        diagonal = np.concatenate([identity, np.zeros(d_1 - dim, dim)], axis=0)
     else:
-        diagonal = I
+        diagonal = identity
 
     #diagonal = rng.permutation(diagonal)
     diagonal_dominance = np.exp(factor_potential) + diagonal * 50000
@@ -26,15 +26,15 @@ def diagonal_potential_conv(d_1: int, d_2: int,
     kernel = np.array([[0.5, 1, 0.5]])
     factor_potential = rng.randint(4, 10, size=(d_1, d_2)) * 1.0
     dim = np.min([d_1, d_2])
-    I = np.eye(dim)
+    identity = np.eye(dim)
     if rng.normal(size=1) > 1:
-        I = np.flip(I, axis=0)
+        identity = np.flip(identity, axis=0)
     if d_2 > d_1:
-        diagonal = np.concatenate([I, np.zeros(dim, d_2 - dim)], axis=1)
+        diagonal = np.concatenate([identity, np.zeros(dim, d_2 - dim)], axis=1)
     elif d_2 < d_1:
-        diagonal = np.concatenate([I, np.zeros(d_1 - dim, dim)], axis=0)
+        diagonal = np.concatenate([identity, np.zeros(d_1 - dim, dim)], axis=0)
     else:
-        diagonal = I
+        diagonal = identity
 
     diagonal = rng.permutation(diagonal)
     diagonal_dominance = np.exp(factor_potential) + diagonal * 50000
@@ -45,14 +45,14 @@ def diagonal_potential_conv(d_1: int, d_2: int,
 
 
 def identity_potential(d_1: int, d_2: int,
-                       rng: np.random.RandomState) -> np.ndarray:
+                       rng: np.random.RandomState) -> np.ndarray:  # pylint: disable=unused-argument
     dim = np.min([d_1, d_2])
-    I = np.eye(dim)
+    identity = np.eye(dim)
     if d_2 > d_1:
-        diagonal = np.concatenate([I, np.zeros(dim, d_2 - dim)], axis=1)
+        diagonal = np.concatenate([identity, np.zeros(dim, d_2 - dim)], axis=1)
     elif d_2 < d_1:
-        diagonal = np.concatenate([I, np.zeros(d_1 - dim, dim)], axis=0)
+        diagonal = np.concatenate([identity, np.zeros(d_1 - dim, dim)], axis=0)
     else:
-        diagonal = I
+        diagonal = identity
 
     return diagonal

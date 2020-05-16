@@ -36,7 +36,7 @@ class WifiSimulator(MigrSimulator):
         self._prcs["sensor_potential"] = np.array(potential).reshape(
             self.status_d, self._sim["num_sensor"])
 
-    def init_stats_sampler(self):
+    def init_stats_sampler(self):  # pylint: disable=no-self-use
         if np.random.normal() > -0.5:
             return 0
 

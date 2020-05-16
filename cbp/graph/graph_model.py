@@ -22,8 +22,8 @@ class GraphModel(BaseGraph):
     def run_bp(self, algo=None):
         if algo is None:
             algo = self.norm_product_bp
-        elif algo == self.iterative_scaling:
-            if self.coef_policy != bp_policy:
+        elif algo == self.iterative_scaling:  # pylint: disable=comparison-with-callable
+            if self.coef_policy != bp_policy:  # pylint: disable=comparison-with-callable
                 self.coef_policy = bp_policy
 
         self.bake()

@@ -29,7 +29,7 @@ class FactorNode(BaseNode):
             num_connectednode.append(int(item[8:]))
 
         if any(i > j for i, j in zip(num_connectednode, num_connectednode[1:])):
-            raise RuntimeError(f'Set the connection of factor in order')
+            raise RuntimeError('Set the connection of factor in order')
 
     def check_before_run(self, node_map):
         super().check_before_run(node_map)

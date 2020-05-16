@@ -113,14 +113,14 @@ class MigrVisualizer():
         """
         xx = []
         yy = []
-        xy_size = []
+        xy_cnt = []
         for xy, cnt in enumerate(bins):
             if cnt > 0:
                 row, col = self.ind2rowcol(xy)
                 xx.append(col)
                 yy.append(row)
-                xy_size.append(int(cnt))
-        self.visualize_location(xx, yy, xy_size, **kwargs)
+                xy_cnt.append(int(cnt))
+        self.visualize_location(xx, yy, xy_cnt, **kwargs)
 
     def ind2rowcol(self, index):
         index = np.array(index).astype(np.int64)

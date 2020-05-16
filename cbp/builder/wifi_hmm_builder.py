@@ -8,7 +8,7 @@ from .wifi_simulator import WifiSimulator
 
 
 class WifiHMMBuilder(HMMBuilder):
-    def __init__(self, length, grid_d, policy,
+    def __init__(self, length, grid_d, policy,  # pylint: disable=too-many-arguments
                  rand_seed=1, num_sensor=16, time_step=60):
         super().__init__(length, grid_d * grid_d, policy, rand_seed)
         simulator_path = Path(

@@ -133,7 +133,7 @@ class MigrSimulator:  # pylint: disable=too-many-instance-attributes
         return self.sample_engine(state, self._sim["num_sensor"],
                                   self._prcs["sensor_potential"])
 
-    def init_stats_sampler(self):
+    def init_stats_sampler(self):  # pylint: disable=no-self-use
         return 0
 
     def sample(self, num_sample):
@@ -168,12 +168,6 @@ class MigrSimulator:  # pylint: disable=too-many-instance-attributes
             title="transition_potential",
             path="data/migr/transition_potential")
 
-    def ind2rowcol(self, index):
-        index = np.array(index).astype(np.int64)
-        row = (index / self.d_col).astype(np.int64)
-        col = index % self.d_col
-        return row, col
-
     def viz_gt(self):
         self.visualizer.migration(self._prcs["traj"],
                                   **{"title": "bird traj",
@@ -201,8 +195,8 @@ class MigrSimulator:  # pylint: disable=too-many-instance-attributes
 
         if isinstance(time_step, int):
             return self._prcs["constrained_marginal"][time_step, :]
-        else:
-            return self._prcs["constrained_marginal"]
+
+        return self._prcs["constrained_marginal"]
 
     def get_gt_marginal(self, time_step=None):
         if "gt_marginal" not in self._prcs:
@@ -211,8 +205,8 @@ class MigrSimulator:  # pylint: disable=too-many-instance-attributes
 
         if isinstance(time_step, int):
             return self._prcs["gt_marginal"][time_step, :]
-        else:
-            return self._prcs["gt_marginal"]
+
+        return self._prcs["gt_marginal"]
 
     def get_tansition_potential(self):
         return self._prcs["transition_potential"]
