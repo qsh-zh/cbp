@@ -63,6 +63,11 @@ class GraphModel(BaseGraph):
         return epsilons, step
 
     def itsbp(self):
+        """run sinkhorn or iterative scaling inference
+
+        :return: [description]
+        :rtype: [type]
+        """
         self.init_cnp_coef()
         self.first_belief_propagation()
 

@@ -136,7 +136,7 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         axes = sns.heatmap(self._prcs[PotentialType.TRANSITION])
         axes.set_title("Transition Potential")
         fig = axes.get_figure()
-        fig.savefig(f"{self.paht}/hmm_transition.png")
+        fig.savefig(f"{self.path}/hmm_transition.png")
         plt.close(fig)
 
     def get_constrained_marginal(self, time_step=None):

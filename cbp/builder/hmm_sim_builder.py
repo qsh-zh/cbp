@@ -32,7 +32,7 @@ class HMMSimBuilder(HMMBuilder):
         :rtype: cbp.FactorNode
         """
         if is_conv:  # emit
-            potential = self.simulator.get_observation_potential()
+            potential = self.simulator.get_emission_potential()
         else:
             potential = self.simulator.get_tansition_potential()
         factornode = FactorNode(name_list, potential)
