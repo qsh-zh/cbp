@@ -10,5 +10,5 @@ class TestMigrSim(unittest.TestCase):
         sim.sample(10)
         sim.viz_gt()
         sim.viz_sensor()
-        sim.viz_sensor_potential()
+        sim.viz_emission_potential()
         sim.viz_trans_potential()

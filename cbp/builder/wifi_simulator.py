@@ -3,6 +3,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from .migr_simulator import MigrSimulator
 
+from .hmm_simulator import PotentialType
+
 
 class WifiSimulator(MigrSimulator):
     """simulate ensemble move, sensor is sparse
@@ -13,18 +15,26 @@ class WifiSimulator(MigrSimulator):
     def __init__(self, time_step, d_col, d_row, random_seed):
         # use random_seed 3, random_sensor 16, reproduce the experiment result
         super().__init__(time_step, d_col, d_row, random_seed)
-        self._sim["num_sensor"] = 0
+        self.obser_d = 0
         self.hotspot = []
 
+    def compile(self):
+        super().compile()
+
+        potential = np.zeros(self.status_d)
+        potential[0] = 0.7
+        potential[int(self.d_col / 2)] = 0.3
+        self.register_potential(PotentialType.INIT, potential)
+
     def register_hotspot(self, row, col):
-        self._sim["num_sensor"] += 1
+        self.obser_d += 1
         self.hotspot.append((row, col))
 
     def _produce_sensor_potential(self):
         potential = []
         for cur_row in range(self.d_row):
             for cur_col in range(self.d_col):
-                cur_potential = np.zeros(self._sim["num_sensor"])
+                cur_potential = np.zeros(self.obser_d)
 
                 for i, sensor in enumerate(self.hotspot):
                     distance = np.linalg.norm(
@@ -33,12 +43,9 @@ class WifiSimulator(MigrSimulator):
 
                 potential.append(cur_potential / np.sum(cur_potential))
 
-        self._prcs["sensor_potential"] = np.array(potential).reshape(
-            self.status_d, self._sim["num_sensor"])
-
-    def init_stats_sampler(self):  # pylint: disable=no-self-use
-        if np.random.normal() > -0.5:
-            return 0
+        self.register_potential(
+            PotentialType.EMISSION,
+            np.array(potential).reshape(self.status_d, self.obser_d))
 
         return int(self.d_col / 2)
 
@@ -54,6 +61,8 @@ class WifiSimulator(MigrSimulator):
             self.register_hotspot(row, col)
 
     def draw_sensor(self):
+        """draw wifi sensor position in grid
+        """
         sensor_row = []
         sensor_col = []
         for sensor in self.hotspot:
@@ -84,18 +93,20 @@ class WifiSimulator(MigrSimulator):
         ax.set_yticklabels(np.arange(0, self.d_row, 2).tolist())
         handles, _ = ax.get_legend_handles_labels()
         ax.legend(handles, ["cell", "sensor"])
-        plt.savefig("data/migr/sensor.png", bbox_inches='tight')
+        plt.savefig(f"{self.path}/sensor.png", bbox_inches='tight')
         plt.close()
 
     def viz_sensor(self):
+        """draw raw sensor data
+        """
         for i in range(self.time_step):
             locations = self._prcs["sensor"][:, i]
             bins, _ = np.histogram(
                 locations, np.arange(
-                    self._sim["num_sensor"] + 1))
-            self.draw_sensordata(bins, f"data/migr/observer_{i}_step.png")
+                    self.obser_d + 1))
+            self.__draw_sensordata(bins, f"{self.path}/observer_{i}_step.png")
 
-    def draw_sensordata(self, bins, fig_name):
+    def __draw_sensordata(self, bins, fig_name):
         xx = []
         yy = []
         xy_size = []

@@ -6,6 +6,7 @@ from .hmm_zero_builder import HMMZeroBuilder
 from .wifi_hmm_builder import WifiHMMBuilder
 from .wifi_simulator import WifiSimulator
 from .migr_simulator import MigrSimulator
+from .hmm_simulator import HMMSimulator, PotentialType
 
 __all__ = [
     "HMMBuilder",
@@ -15,5 +16,7 @@ __all__ = [
     "HMMZeroBuilder",
     "WifiSimulator",
     "MigrSimulator",
-    "WifiHMMBuilder"
+    "WifiHMMBuilder",
+    "HMMSimulator",
+    "PotentialType"
 ]
