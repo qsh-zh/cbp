@@ -4,10 +4,22 @@ import numpy as np
 from cbp.builder import HMMBuilder, HMMZeroBuilder, LineBuilder
 from cbp.graph.coef_policy import bp_policy
 
-from .utils import sinkhorn_bp_equal
+from .utils import sinkhorn_bp_equal, two_node_tree
 
 
 class TestITSbp(unittest.TestCase):
+    def test_itsbp_get_loop_single(self):
+        graph = two_node_tree()
+        graph.bake()
+        _, link = graph.its_next_looplink()
+        nodenames = [node.name for node in link]
+        expected_names = [
+            "VarNode_000",
+            "FactorNode_000",
+            "VarNode_001"
+        ]
+        self.assertEqual(nodenames, expected_names)
+
     def test_itsbp_get_loop(self):
         graph = HMMBuilder(3, 2, bp_policy)()
         graph.bake()
