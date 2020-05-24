@@ -33,6 +33,14 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.silent = silent
 
     def add_varnode(self, node):
+        """add one `~cbp.node.VarNode` to this graph, idx follow the increasing
+        order
+
+        :param node: one VarNode
+        :type node: VarNode
+        :return: name of varnode
+        :rtype: str
+        """
         assert isinstance(node, VarNode)
         varnode_name = f"VarNode_{self.cnt_varnode:03d}"
         node.format_name(varnode_name)
@@ -45,6 +53,18 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         return varnode_name
 
     def add_factornode(self, factornode):
+        """add one factor node to the graph
+        Do the following tasks
+
+        * add node to the recorders
+        * set connections
+        * set parent relation
+
+        :param factornode: one factor node
+        :type factornode: FactorNode
+        :return: name of factor node
+        :rtype: str
+        """
         factornode.check_potential(self.varnode_recorder)
         factornode_name = f"FactorNode_{self.cnt_factornode:03d}"
         factornode.format_name(factornode_name)
@@ -70,6 +90,11 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             varnode.parent = factornode
 
     def pmf(self):
+        """output the probability mass matrix through brutal-force methods
+
+        :return: joint probability mass matrix
+        :rtype: ndarray
+        """
         varnode_names = list(self.varnode_recorder.keys())
         varnodes = list(self.varnode_recorder.values())
         var_dim = [variable.rv_dim for variable in varnodes]
@@ -103,7 +128,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
                 message = Message(node, val)
                 self.node_recorder[recipient_name].store_message(message)
 
-    def init_sinkhorn_node(self):
+    def __init_sinkhorn_node(self):
         varnode_names = list(self.varnode_recorder.keys())
         self.sinkhorn_node_coef = {}  # pylint: disable=attribute-defined-outside-init
         for node_name in self.constrained_recorder:
@@ -155,7 +180,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def sinkhorn(self, max_iter=5000000, tolerance=1e-5):
         self.check_sinkhorn()
         tilde_c = self.pmf()
-        self.init_sinkhorn_node()
+        self.__init_sinkhorn_node()
 
         sinkhorn_func = partial(self.sinkhorn_update, tilde_c)
         return engine_loop(engine_fun=sinkhorn_func,
@@ -196,6 +221,16 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         return self.node_recorder[name_str]
 
     def delete_node(self, name_str):
+        """delete node from graph, needs to check following
+
+        * judge type, Factor or Variable
+        * delete from the various recorders
+        * clear connections
+
+        :param name_str: [description]
+        :type name_str: [type]
+        :raises RuntimeError: [description]
+        """
         if name_str not in self.node_recorder:
             raise RuntimeError(f"{name_str} is illegal, not in this graph")
         target_node = self.node_recorder[name_str]
@@ -244,6 +279,16 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
                 for node_name, node in self.varnode_recorder.items()}
 
     def plot(self, png_name='file.png'):
+        """plot the graph through graphviz
+
+            * red: constrained variable
+            * blue: free variable node
+            * green: factor
+
+        :param png_name: name of figure, defaults to 'file.png'
+        :type png_name: str, optional
+        :raises ValueError: [description]
+        """
         if pygraphviz is not None:
             graph = pygraphviz.AGraph(directed=False)
             for varnode_name in self.varnode_recorder:
