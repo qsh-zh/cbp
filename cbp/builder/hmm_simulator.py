@@ -4,9 +4,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.random import RandomState
 import seaborn as sns
 from cbp.utils.np_utils import empirical_marginal
-from numpy.random import RandomState
 
 
 class PotentialType(str, Enum):
@@ -142,7 +142,8 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
     def get_constrained_marginal(self, time_step=None):
         """return observation marginal
 
-        :param time_step: if int then return a specific time distribution otherwise all distributions as matrxi, defaults to None
+        :param time_step: if int then return a specific time distribution
+        otherwise all distributions as matrxi, defaults to None
         :type time_step: int, optional
         :return: array for single time_step or a matrix
         :rtype: ndarray
@@ -159,7 +160,8 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
     def get_gt_marginal(self, time_step=None):
         """return ground truth marginal
 
-        :param time_step: if int then return a specific time distribution otherwise all distributions as matrix, defaults to None
+        :param time_step: if int then return a specific time distribution
+        otherwise all distributions as matrix, defaults to None
         :type time_step: int, optional
         :return: array for single time_step or a matrix
         :rtype: ndarray

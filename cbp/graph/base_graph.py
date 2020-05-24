@@ -21,6 +21,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
         self.varnode_recorder = {}
         self.constrained_recorder = []
+        self.leaf_nodes = []
         self.factornode_recorder = {}
         self.node_recorder = {}
         self.epsilon = epsilon
