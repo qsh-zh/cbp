@@ -29,7 +29,7 @@ def find_link(node_a, node_b):
     return a_2root[:-1] + b_2root[:]
 
 
-def iterative_scaling_inner_loop(loop_link):
+def itsbp_inner_loop(loop_link):
     if len(loop_link) == 2:
         return
 

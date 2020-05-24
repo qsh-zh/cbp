@@ -5,29 +5,28 @@ from cbp.utils import (compare_marginals, diff_max_marginals,
 
 from .base_graph import BaseGraph
 from .coef_policy import bp_policy
-from .graph_utils import iterative_scaling_inner_loop, find_link
+from .graph_utils import itsbp_inner_loop, find_link
 
 
 class GraphModel(BaseGraph):
     def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
         super().__init__(silent=silent, epsilon=epsilon, coef_policy=coef_policy)
-        self.iterative_scaling_outer_cnt = 0
+        self.itsbp_outer_cnt = 0
 
     def init_cnp_coef(self):
         for node in self.nodes:
             node.reset()
             node.cal_cnp_coef()
 
-    # decay interface
-    def run_bp(self, algo=None):
-        if algo is None:
-            algo = self.norm_product_bp
-        elif algo == self.iterative_scaling:  # pylint: disable=comparison-with-callable
-            if self.coef_policy != bp_policy:  # pylint: disable=comparison-with-callable
-                self.coef_policy = bp_policy
-
+    def run_cnp(self):
         self.bake()
-        return algo()
+        return self.norm_product_bp()
+
+    def run_bp(self):
+        if self.coef_policy != bp_policy:  # pylint: disable=comparison-with-callable
+            self.coef_policy = bp_policy
+        self.bake()
+        return self.itsbp()
 
     def norm_product_bp(self, max_iter=5000000, tolerance=1e-5, error_fun=None):
         if error_fun is None:
@@ -63,7 +62,7 @@ class GraphModel(BaseGraph):
 
         return epsilons, step
 
-    def iterative_scaling(self):
+    def itsbp(self):
         self.init_cnp_coef()
         self.first_belief_propagation()
 
@@ -72,30 +71,30 @@ class GraphModel(BaseGraph):
                          tolerance=1e-2,
                          error_fun=diff_max_marginals)
 
-        return self.engine_loop(self.iterative_scaling_outer_loop,
+        return self.engine_loop(self.itsbp_outer_loop,
                                 tolerance=1e-3,
                                 error_fun=diff_max_marginals,
                                 isoutput=False)
 
-    def iterative_scaling_outer_counting(self):
-        self.iterative_scaling_outer_cnt += 1
+    def itsbp_outer_counting(self):
+        self.itsbp_outer_cnt += 1
 
-        self.iterative_scaling_outer_cnt %= len(self.constrained_nodes)
+        self.itsbp_outer_cnt %= len(self.leaf_nodes)
 
     def its_next_looplink(self):
-        target_node = self.constrained_nodes[self.iterative_scaling_outer_cnt]
+        target_node = self.leaf_nodes[self.itsbp_outer_cnt]
         # target_node.sendout_message()
 
-        next_node = self.constrained_nodes[(
-            self.iterative_scaling_outer_cnt + 1) % len(self.constrained_nodes)]
+        next_node = self.leaf_nodes[(
+            self.itsbp_outer_cnt + 1) % len(self.leaf_nodes)]
 
-        self.iterative_scaling_outer_counting()
+        self.itsbp_outer_counting()
         return target_node, find_link(target_node, next_node)
 
-    def iterative_scaling_outer_loop(self):
-        for _ in range(len(self.constrained_nodes)):
+    def itsbp_outer_loop(self):
+        for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
-            inner_fun = partial(iterative_scaling_inner_loop, loop_link)
+            inner_fun = partial(itsbp_inner_loop, loop_link)
 
             self.engine_loop(inner_fun,
                              tolerance=1e-2,

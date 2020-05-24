@@ -16,7 +16,7 @@ class TestGraph(unittest.TestCase):
                 print(
                     f"Run {i}-th experiment, {num_node} nodes with {node_dim} status")
                 self.graph = HMMBuilder(num_node, node_dim, policy)()
-                self.graph.run_bp()
+                self.graph.run_cnp()
                 self.graph.sinkhorn()
                 self.assertTrue(all(sinkhorn_bp_equal(self.graph, num_node)))
 
@@ -28,6 +28,6 @@ class TestGraph(unittest.TestCase):
                 print(
                     f"Run {i}-th experiment, {num_node} nodes with {node_dim} status")
                 self.graph = LineBuilder(num_node, node_dim, avg_policy)()
-                self.graph.run_bp()
+                self.graph.run_cnp()
                 self.graph.sinkhorn()
                 self.assertTrue(all(sinkhorn_bp_equal(self.graph, num_node)))

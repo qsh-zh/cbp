@@ -14,8 +14,8 @@ Run Belief Propagation
 ----------------------
 ::
 
-    graph.run_bp() # default is constrained norm-product
-    graph.run_bp(graph.iterative_scaling) # run iterative scaling belief propagation
+    graph.run_cnp() # default is constrained norm-product
+    graph.run_bp() # run iterative scaling belief propagation
 
 Access to the marginal
 ----------------------

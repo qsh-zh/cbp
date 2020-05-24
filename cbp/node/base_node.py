@@ -99,7 +99,8 @@ class BaseNode(ABC):
         val = self.make_message(recipient_node)
         message = Message(self, val)
         recipient_node.store_message(message)
-        if not is_silent:
+        # if not is_silent:
+        if True:
             print(self.name + '->' + recipient_node.name)
             print(message.val)
 

@@ -186,8 +186,8 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         variables = list(self.varnode_recorder.values())
         # in Norm-Product, run factor message first
         self.nodes = factors + variables  # pylint: disable=attribute-defined-outside-init
-        self.constrained_nodes = [self.varnode_recorder[name]  # pylint: disable=attribute-defined-outside-init
-                                  for name in self.constrained_recorder]
+        self.leaf_nodes = [
+            node for node in self.nodes if len(node.get_connections()) == 1]
 
     def get_node(self, name_str):
         if name_str not in self.node_recorder:
