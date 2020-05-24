@@ -221,11 +221,21 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             self.constrained_recorder.remove(node.name)
 
     def export_marginals(self):
+        """export the marginal for variable nodes
+
+        :return: {node.key:node.marginal}
+        :rtype: dict
+        """
         return {
             n.name: n.marginal() for n in self.varnode_recorder.values()
         }
 
     def export_convergence_marginals(self):
+        """export the marginal for variable nodes and factor nodes
+
+        :return: {node.key:node.marginal}
+        :rtype: dict
+        """
         return {n.name: n.marginal() for n in self.nodes}
 
     def export_sinkhorn(self):
