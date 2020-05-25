@@ -18,6 +18,14 @@ class PotentialType(str, Enum):
 
 
 class HMMSimulator:  # pylint: disable=too-many-instance-attributes
+    """simulator from a time-homogenous process.\
+        The setup need:
+
+        * potential: type in the `cbp.builder.PotentialType`, register various potential
+        * change to a distinguishable name
+        * call sample methods
+    """
+
     def __init__(self, time_step, dim_status, dim_observations, random_seed):  # pylint: disable=too-many-function-args
         self.__name = None
         self.path = Path('data/sim')
@@ -106,6 +114,11 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         return self.rng.choice(self.status_d, p=self._prcs[PotentialType.INIT])
 
     def sample(self, num_sample):
+        """start simulation process with many particles
+
+        :param num_sample: num of particles
+        :type num_sample: int
+        """
         self._prcs["num_sample"] = num_sample
         traj_recorder = []
         sensor_recorder = []
@@ -182,6 +195,8 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         return self._prcs[PotentialType.EMISSION]
 
     def save(self):
+        """save the instance to a pkl
+        """
         sim_path = f"{self.path}/sim.pkl"
         with open(sim_path, 'wb') as handle:
             pickle.dump(self, handle)
