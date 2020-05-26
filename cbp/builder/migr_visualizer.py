@@ -38,6 +38,7 @@ class MigrVisualizer():
     def visualize_location(self, xx, yy, xy_size, **kwargs):
         """plot grid location distribution. Origin point is in DownLeft.
         3 reservered key in kwargs:
+
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``
@@ -84,6 +85,7 @@ class MigrVisualizer():
     def migration(self, data, **kwargs):
         """draw migration figure, heat map distribution
         3 reservered key in kwargs:
+
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``
@@ -104,6 +106,7 @@ class MigrVisualizer():
     def visualize_map_bins(self, bins, **kwargs):
         """converts the statistics bins data to the map figure.
         3 reservered key in kwargs:
+
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``

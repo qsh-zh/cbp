@@ -26,6 +26,22 @@ cbp.builder.hmm\_zero\_builder
    :undoc-members:
    :show-inheritance:
 
+cbp.builder.hmm\_sim\_builder
+-------------------------------------
+
+.. automodule:: cbp.builder.hmm_sim_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cbp.builder.hmm\_simulator
+-------------------------------------
+
+.. automodule:: cbp.builder.hmm_simulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cbp.builder.line\_builder
 --------------------------------
 

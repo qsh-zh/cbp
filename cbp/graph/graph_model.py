@@ -1,6 +1,6 @@
 from functools import partial
 
-from cbp.utils import (compare_marginals, diff_max_marginals,
+from cbp.utils import (diff_1d_marginal, diff_max_marginals,
                        engine_loop)
 
 from .base_graph import BaseGraph
@@ -23,6 +23,11 @@ class GraphModel(BaseGraph):
         return self.norm_product_bp()
 
     def run_bp(self):
+        """run iterative scaling belief propagation
+
+        :return: [description]
+        :rtype: [type]
+        """
         if self.coef_policy != bp_policy:  # pylint: disable=comparison-with-callable
             self.coef_policy = bp_policy
         self.bake()
@@ -48,7 +53,7 @@ class GraphModel(BaseGraph):
             error_fun=None,
             isoutput=False):
         if error_fun is None:
-            error_fun = compare_marginals
+            error_fun = diff_1d_marginal
 
         epsilons, step, _ = engine_loop(
             engine_fun=engine_fun,

@@ -33,7 +33,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.silent = silent
 
     def add_varnode(self, node):
-        """add one `~cbp.node.VarNode` to this graph, idx follow the increasing
+        """add one `cbp.node.VarNode` to this graph, idx follow the increasing
         order
 
         :param node: one VarNode
