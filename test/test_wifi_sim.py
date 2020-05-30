@@ -1,4 +1,5 @@
-from cbp.builder import WifiSimulator
+from cbp.builder import WifiSimulator, WifiHMMBuilder
+from cbp.graph.coef_policy import bp_policy
 import unittest
 
 
@@ -11,3 +12,13 @@ class TestWifiSim(unittest.TestCase):
         sim.viz_gt()
         sim.viz_sensor()
         sim.viz_trans_potential()
+
+    @unittest.SkipTest("test builder")
+    def test_wifi_builder(self):
+        builder = WifiHMMBuilder(
+            length=20,
+            grid_d=10,
+            policy=bp_policy,
+            rand_seed=5,
+            num_sensor=64,
+            time_step=20)
