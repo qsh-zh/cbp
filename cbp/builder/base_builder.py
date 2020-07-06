@@ -5,6 +5,7 @@ from numpy.random import RandomState
 from cbp.graph import GraphModel
 from cbp.node import VarNode, FactorNode
 
+from cbp.builder.potential_utils import diagonal_potential_different
 from .potential_utils import diagonal_potential, diagonal_potential_conv
 
 
@@ -45,6 +46,17 @@ class BaseBuilder(ABC):
                 self.node_dim, self.node_dim, self.rng)
         else:
             factor_potential = diagonal_potential(
+                self.node_dim, self.node_dim, self.rng)
+        factornode = FactorNode(name_list, factor_potential)
+        self.graph.add_factornode(factornode)
+        return factornode
+
+    def add_factor_different(self, name_list, is_conv=False):
+        if is_conv:
+            factor_potential = diagonal_potential_conv(
+                self.node_dim, self.node_dim, self.rng)
+        else:
+            factor_potential = diagonal_potential_different(
                 self.node_dim, self.node_dim, self.rng)
         factornode = FactorNode(name_list, factor_potential)
         self.graph.add_factornode(factornode)

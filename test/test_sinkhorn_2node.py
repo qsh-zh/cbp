@@ -13,7 +13,7 @@ class TestGraph(unittest.TestCase):
         self.graph.varnode_recorder['VarNode_000'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_000'].isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_000')
+        self.graph.constrained_names.append('VarNode_000')
         self.graph.sinkhorn()
         node_equal = np.isclose(
             self.graph.varnode_recorder['VarNode_000'].sinkhorn,
@@ -30,7 +30,7 @@ class TestGraph(unittest.TestCase):
         self.graph.varnode_recorder['VarNode_001'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_001'].isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_001')
+        self.graph.constrained_names.append('VarNode_001')
         self.graph.sinkhorn()
         node_equal = np.isclose(
             self.graph.varnode_recorder['VarNode_001'].sinkhorn,
@@ -50,8 +50,8 @@ class TestGraph(unittest.TestCase):
         self.graph.varnode_recorder['VarNode_001'].constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.varnode_recorder['VarNode_001'].isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_000')
-        self.graph.constrained_recorder.append('VarNode_001')
+        self.graph.constrained_names.append('VarNode_000')
+        self.graph.constrained_names.append('VarNode_001')
         self.graph.sinkhorn()
         node_equal = np.isclose(
             self.graph.varnode_recorder['VarNode_000'].sinkhorn,

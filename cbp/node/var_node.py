@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 from cbp.utils.np_utils import nd_expand
 
@@ -16,14 +14,9 @@ class VarNode(BaseNode):
 
     def __init__(self, rv_dim, potential=None,
                  constrained_marginal=None, node_coef=1):
-        super().__init__(node_coef, potential)
-
         self.rv_dim = rv_dim
         self.hat_c_i = None
-
-        if self.potential is None:
-            self.potential = np.ones([rv_dim])
-        assert self.potential.shape[0] == rv_dim
+        super().__init__(node_coef, potential)
 
         if constrained_marginal is None:
             self.isconstrained = False
@@ -31,7 +24,14 @@ class VarNode(BaseNode):
             assert constrained_marginal.shape[0] == rv_dim
             assert abs(np.sum(constrained_marginal) - 1) < 1e-6
             self.isconstrained = True
+            constrained_marginal = np.clip(constrained_marginal, 1e-12, np.inf)
         self.constrained_marginal = constrained_marginal
+
+    def _check_potential(self, potential):
+        if potential is None:
+            return np.ones([self.rv_dim])
+        assert potential.shape[0] == self.rv_dim
+        return potential
 
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)
@@ -62,18 +62,21 @@ class VarNode(BaseNode):
         hat_c_ialpha = recipient_node.get_hat_c_ialpha(self.name)
         c_alpha = recipient_node.node_coef
         vals = [message.val for message in self.latest_message]
-        if self.isconstrained:
-            log_numerator = self.epsilon * np.log(self.constrained_marginal)
-        else:
-            potential_part = 1.0 / self.hat_c_i * np.log(self.potential)
-            message_part = 1.0 / self.hat_c_i * np.log(np.prod(vals, axis=0))
-            log_numerator = potential_part + message_part
-        clip_base = vals[recipient_index_in_var]
-        log_denominator = 1.0 / hat_c_ialpha * np.log(clip_base)
 
-        log_base = c_alpha * (log_numerator - log_denominator)
-        log_base = log_base - np.max(np.nan_to_num(log_base))
-        return np.exp(log_base)
+        with np.errstate(divide='raise'):
+            if self.isconstrained:
+                log_numerator = self.epsilon * np.log(self.constrained_marginal)
+            else:
+                potential_part = 1.0 / self.hat_c_i * np.log(self.potential)
+                message_part = 1.0 / self.hat_c_i * \
+                    np.log(np.prod(vals, axis=0))
+                log_numerator = potential_part + message_part
+            clip_base = vals[recipient_index_in_var]
+            log_denominator = 1.0 / hat_c_ialpha * np.log(clip_base)
+
+            log_base = c_alpha * (log_numerator - log_denominator)
+            log_base = log_base - np.max(np.nan_to_num(log_base))
+            return np.exp(log_base)
 
     def make_message_bp(self, recipient_node):
         assert self.coef_ready,\
@@ -95,6 +98,14 @@ class VarNode(BaseNode):
     def make_message(self, recipient_node):
         return self.make_message_bp(recipient_node)
 
+    def cal_bethe(self, margin):
+        clip_margin = np.clip(margin, 1e-12, np.inf)
+        log_margin = np.log(clip_margin)
+        entropy_term = -(self.node_degree - 1) * np.sum(margin * log_margin)
+        clip_potential = np.clip(self.potential, 1e-12, np.inf)
+        potential_term = -np.sum(margin * np.log(clip_potential))
+        return potential_term + entropy_term
+
     def marginal(self):
         if self.isconstrained:
             return self.constrained_marginal
@@ -106,55 +117,3 @@ class VarNode(BaseNode):
             return belief / np.sum(belief)
 
         return np.ones(self.rv_dim) / self.rv_dim
-
-    def to_json(self, separators=(',', ':'), indent=4):
-        return json.dumps({
-            'class': 'VarNode',
-            'name': self.name,
-            'potential': self.potential.tolist(),
-            'node_coef': self.node_coef,
-            'constraine_marginal':
-            self.constrained_marginal.tolist() if self.isconstrained else None,
-            'connections': self.connections
-        }, separators=separators, indent=indent)
-
-    @classmethod
-    def from_json(cls, json_file):
-        d_context = json.loads(json_file)
-
-        if d_context['class'] != 'VarNode':
-            raise IOError(
-                f"Need a VarNode class json to construct VarNode instead of {d_context['class']}")
-
-        potential = d_context['potential']
-        coef = d_context['node_coef']
-        constraine_marginal = d_context['constraine_marginal']
-        if isinstance(constraine_marginal, list):
-            constraine_marginal = np.asarray(constraine_marginal)
-        node = cls(
-            len(potential),
-            np.asarray(potential),
-            constraine_marginal,
-            node_coef=coef)
-        node.format_name(d_context['name'])
-        for factor_node in d_context['connections']:
-            node.register_connection(factor_node)
-        return node
-
-    def __eq__(self, value):
-        if isinstance(value, VarNode):
-            flag = []
-            flag.append(self.name == value.name)
-            flag.append(np.array_equal(self.potential, value.potential))
-            flag.append(np.array_equal(self.node_coef, value.node_coef))
-            flag.append(self.isconstrained == value.isconstrained)
-            flag.append(
-                np.array_equal(
-                    self.constrained_marginal,
-                    value.constrained_marginal))
-            flag.append(self.node_degree == value.node_degree)
-            flag.append(self.connections == value.connections)
-            if np.sum(flag) == len(flag):
-                return True
-
-        return False

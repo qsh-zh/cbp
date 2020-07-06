@@ -11,20 +11,19 @@ class WifiHMMBuilder(HMMSimBuilder):
 
     def __init__(self, length, grid_d, policy,  # pylint: disable=too-many-arguments
                  rand_seed=1, num_sensor=16, time_step=60):
-        sim_name = f'wifi-timestep_{time_step}-d_{grid_d}-ns_{num_sensor}-rs_{rand_seed}'
+        sim_name = f'wifi-timestep_{time_step}-d_{grid_d}-rs_{rand_seed}-ns_{num_sensor}'
         sim_path = Path(f"data/sim/{sim_name}/sim.pkl")
         if sim_path.is_file():
             print(f"loading simulator from {sim_path}")
             simulator = WifiSimulator.load(sim_name)
         else:
-            simulator = WifiSimulator(60, grid_d, grid_d, rand_seed)
+            simulator = WifiSimulator(time_step, grid_d, grid_d, rand_seed)#Changed 60 to time_step
             simulator.name = sim_name
             simulator.random_sensor(num_sensor)
             simulator.compile()
             simulator.sample(10000)
             simulator.viz_sensor()
             simulator.viz_gt()
-            simulator.draw_sensor()
             print(f"saving simulator in {simulator.path}")
             simulator.save()
 

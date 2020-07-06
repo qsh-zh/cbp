@@ -15,26 +15,26 @@ class WifiSimulator(MigrSimulator):
     def __init__(self, time_step, d_col, d_row, random_seed):
         # use random_seed 3, random_sensor 16, reproduce the experiment result
         super().__init__(time_step, d_col, d_row, random_seed)
-        self.obser_d = 0
+        self.record.obser_num = 0
         self.hotspot = []
 
     def compile(self):
         super().compile()
 
-        potential = np.zeros(self.status_d)
+        potential = np.zeros(self.record.state_num)
         potential[0] = 0.7
         potential[int(self.d_col / 2)] = 0.3
         self.register_potential(PotentialType.INIT, potential)
 
     def register_hotspot(self, row, col):
-        self.obser_d += 1
+        self.record.obser_num += 1
         self.hotspot.append((row, col))
 
     def _produce_sensor_potential(self):
         potential = []
         for cur_row in range(self.d_row):
             for cur_col in range(self.d_col):
-                cur_potential = np.zeros(self.obser_d)
+                cur_potential = np.zeros(self.record.obser_num)
 
                 for i, sensor in enumerate(self.hotspot):
                     distance = np.linalg.norm(
@@ -45,7 +45,9 @@ class WifiSimulator(MigrSimulator):
 
         self.register_potential(
             PotentialType.EMISSION,
-            np.array(potential).reshape(self.status_d, self.obser_d))
+            np.array(potential).reshape(
+                self.record.state_num,
+                self.record.obser_num))
 
         return int(self.d_col / 2)
 
@@ -99,11 +101,11 @@ class WifiSimulator(MigrSimulator):
     def viz_sensor(self):
         """draw raw sensor data
         """
-        for i in range(self.time_step):
-            locations = self._prcs["sensor"][:, i]
+        for i in range(self.record.time_step):
+            locations = self.record["sensor"][:, i]
             bins, _ = np.histogram(
                 locations, np.arange(
-                    self.obser_d + 1))
+                    self.record.obser_num + 1))
             self.__draw_sensordata(bins, f"{self.path}/observer_{i}_step.png")
 
     def __draw_sensordata(self, bins, fig_name):

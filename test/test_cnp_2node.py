@@ -13,7 +13,7 @@ class TestGraph(unittest.TestCase):
         self.graph.get_node('VarNode_000').constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.get_node('VarNode_000').isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_000')
+        self.graph.constrained_names.append('VarNode_000')
         self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_001').marginal(),
@@ -30,7 +30,7 @@ class TestGraph(unittest.TestCase):
         self.graph.get_node('VarNode_001').constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.get_node('VarNode_001').isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_001')
+        self.graph.constrained_names.append('VarNode_001')
         self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_001').marginal(),
@@ -50,8 +50,8 @@ class TestGraph(unittest.TestCase):
         self.graph.get_node('VarNode_001').constrained_marginal \
             = np.array([0.5, 0.5])
         self.graph.get_node('VarNode_001').isconstrained = True
-        self.graph.constrained_recorder.append('VarNode_000')
-        self.graph.constrained_recorder.append('VarNode_001')
+        self.graph.constrained_names.append('VarNode_000')
+        self.graph.constrained_names.append('VarNode_001')
         self.graph.run_bp()
         node_equal = np.isclose(
             self.graph.get_node('VarNode_000').marginal(),

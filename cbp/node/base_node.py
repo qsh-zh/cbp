@@ -23,6 +23,7 @@ class BaseNode(ABC):
         """
         self.name = str(uuid.uuid4())
         self.node_coef = node_coef
+        self._potential = None
         self.potential = potential
         self.epsilon = 1
         self.coef_ready = False
@@ -39,6 +40,24 @@ class BaseNode(ABC):
 
     def __repr__(self):
         return self.__str__()
+
+    @property
+    def potential(self):
+        return self._potential
+
+    @potential.setter
+    def potential(self, potential):
+        self._potential = self._check_potential(potential)
+
+    @abstractmethod
+    def _check_potential(self, potential) -> np.ndarray:
+        """check potential before set node potential
+
+        :param potential: input potential
+        :type potential: np.ndarray
+        :return: [description]
+        :rtype: np.ndarray
+        """
 
     def format_name(self, name):
         self.name = name
@@ -95,6 +114,14 @@ class BaseNode(ABC):
         :rtype: np.ndarray
         """
 
+    @abstractmethod
+    def cal_bethe(self, margin) -> float:
+        """calculate the bethe energy
+
+        :return: bethe energy on this node
+        :rtype: float
+        """
+
     def send_message(self, recipient_node, is_silent=True):
         val = self.make_message(recipient_node)
         message = Message(self, val)
@@ -137,15 +164,3 @@ class BaseNode(ABC):
 
         raise RuntimeError(
             f"{node_name} do not appear in {self.name} message")
-
-    def __eq__(self, value):
-        raise NotImplementedError(
-            f"{self.__class__.__name__} is an abstract class")
-
-    def to_json(self, separators=(',', ':'), indent=4):
-        raise NotImplementedError(
-            f"{self.__class__.__name__} is an abstract class")
-
-    @classmethod
-    def from_json(cls, json_file):
-        raise NotImplementedError(f"{cls.__name__} is an abstract class")

@@ -1,6 +1,6 @@
 from functools import partial
 
-from cbp.utils import (diff_1d_marginal, diff_max_marginals,
+from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop)
 
 from .base_graph import BaseGraph
@@ -15,7 +15,6 @@ class GraphModel(BaseGraph):
 
     def init_cnp_coef(self):
         for node in self.nodes:
-            node.reset()
             node.cal_cnp_coef()
 
     def run_cnp(self):
@@ -23,11 +22,6 @@ class GraphModel(BaseGraph):
         return self.norm_product_bp()
 
     def run_bp(self):
-        """run iterative scaling belief propagation
-
-        :return: [description]
-        :rtype: [type]
-        """
         if self.coef_policy != bp_policy:  # pylint: disable=comparison-with-callable
             self.coef_policy = bp_policy
         self.bake()
@@ -53,7 +47,7 @@ class GraphModel(BaseGraph):
             error_fun=None,
             isoutput=False):
         if error_fun is None:
-            error_fun = diff_1d_marginal
+            error_fun = compare_marginals
 
         epsilons, step, _ = engine_loop(
             engine_fun=engine_fun,
@@ -82,7 +76,7 @@ class GraphModel(BaseGraph):
                          error_fun=diff_max_marginals)
 
         return self.engine_loop(self.itsbp_outer_loop,
-                                tolerance=1e-3,
+                                tolerance=1e-4,
                                 error_fun=diff_max_marginals,
                                 isoutput=False)
 
@@ -104,10 +98,10 @@ class GraphModel(BaseGraph):
     def itsbp_outer_loop(self):
         for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
-            inner_fun = partial(itsbp_inner_loop, loop_link)
+            inner_fun = partial(itsbp_inner_loop, loop_link, self.silent)
 
             self.engine_loop(inner_fun,
-                             tolerance=1e-2,
+                             tolerance=1e-3,
                              error_fun=diff_max_marginals,
                              isoutput=False)
 

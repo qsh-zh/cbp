@@ -18,7 +18,7 @@ class MigrSimulator(
         self._sim = {
             "angle_wind": np.pi / 2,
             "sensor_sigma": 4,
-            "num_sensor": self.status_d,
+            "num_sensor": self.record.state_num,
             "destination": (self.d_row, self.d_col)
         }
         self.visualizer = MigrVisualizer(self.d_row, self.d_col)
@@ -29,7 +29,7 @@ class MigrSimulator(
         self._produce_transition_potential()
         self._produce_sensor_potential()
 
-        init_potential = np.zeros(self.status_d)
+        init_potential = np.zeros(self.record.state_num)
         init_potential[0] = 1
         self.register_potential(PotentialType.INIT, init_potential)
 
@@ -93,7 +93,7 @@ class MigrSimulator(
                     self._transition_logistic_regression(
                         cur_col, cur_row))
         self.register_potential(PotentialType.TRANSITION, np.array(
-            potential).reshape(self.status_d, self.status_d))
+            potential).reshape(self.record.state_num, self.record.state_num))
 
     def _produce_sensor_potential(self):
         potential = []
@@ -106,35 +106,35 @@ class MigrSimulator(
                 potential.append(result.flatten() / np.sum(result))
 
         self.register_potential(PotentialType.EMISSION, np.array(
-            potential).reshape(self.status_d, self.status_d))
+            potential).reshape(self.record.state_num, self.record.state_num))
 
     def viz_emission_potential(self):
         self.visualizer.potential_heatmap(
-            self._prcs[PotentialType.EMISSION],
+            self.record[PotentialType.EMISSION],
             title="sensor_potential",
             path=f"{self.path}/sensor_potential")
 
     def viz_trans_potential(self):
         self.visualizer.potential_heatmap(
-            self._prcs[PotentialType.TRANSITION],
+            self.record[PotentialType.TRANSITION],
             title="transition_potential",
             path=f"{self.path}/transition_potential")
 
     def viz_gt(self):
-        self.visualizer.migration(self._prcs["traj"],
+        self.visualizer.migration(self.record["traj"],
                                   **{"title": "bird traj",
                                      "path": f"{self.path}/gt",
                                      "ylabel": True,
                                      "xlabel": 'Ground Truth'})
 
     def viz_sensor(self):
-        self.visualizer.migration(self._prcs["sensor"],
+        self.visualizer.migration(self.record["sensor"],
                                   **{"title": "bird traj",
                                      "path": f"{self.path}/sensor"})
 
     def viz_estm(self, estimated_marginal):
-        for i in range(self.time_step):
-            bins = self._prcs["num_sample"] * \
+        for i in range(self.record.time_step):
+            bins = self.record["num_sample"] * \
                 estimated_marginal[i, :]
             png_name = f"{self.path}/estimated_{i}.png"
             self.visualizer.visualize_map_bins(

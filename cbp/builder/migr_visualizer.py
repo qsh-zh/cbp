@@ -14,7 +14,7 @@ class MigrVisualizer():
         """
         self.d_row = d_row
         self.d_col = d_col
-        self.status_d = d_row * d_col  # total states
+        self.states_num = d_row * d_col  # total states
 
     def potential_heatmap(self, data, **kwargs):
         """plot potential heatmap and save png.
@@ -26,7 +26,7 @@ class MigrVisualizer():
         :param data: i-th row represents the potential of d state
         :type data: ndarray
         """
-        for i in range(self.status_d):
+        for i in range(self.states_num):
             distribution = data[i, :].reshape(self.d_row, self.d_col)
             axes = sns.heatmap(distribution)
             axes.set_title(f"{self.ind2rowcol(i)}_{kwargs['title']}")
@@ -38,7 +38,6 @@ class MigrVisualizer():
     def visualize_location(self, xx, yy, xy_size, **kwargs):
         """plot grid location distribution. Origin point is in DownLeft.
         3 reservered key in kwargs:
-
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``
@@ -85,7 +84,6 @@ class MigrVisualizer():
     def migration(self, data, **kwargs):
         """draw migration figure, heat map distribution
         3 reservered key in kwargs:
-
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``
@@ -95,7 +93,7 @@ class MigrVisualizer():
         _, time_length = data.shape
         for i in range(time_length):
             locations = data[:, i]  # i timestamp distribution
-            bins, _ = np.histogram(locations, np.arange(self.status_d + 1))
+            bins, _ = np.histogram(locations, np.arange(self.states_num + 1))
 
             if 'ylabel' in kwargs:
                 kwargs['ylabel'] = f"t={i}"
@@ -106,7 +104,6 @@ class MigrVisualizer():
     def visualize_map_bins(self, bins, **kwargs):
         """converts the statistics bins data to the map figure.
         3 reservered key in kwargs:
-
         * ``fig_name``: savefig
         * ``xlabel``: xlabel
         * ``ylabel``

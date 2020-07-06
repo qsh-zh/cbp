@@ -13,7 +13,7 @@ class TestWifiSim(unittest.TestCase):
         sim.viz_sensor()
         sim.viz_trans_potential()
 
-    @unittest.SkipTest("test builder")
+    @unittest.skip("test build")
     def test_wifi_builder(self):
         builder = WifiHMMBuilder(
             length=20,

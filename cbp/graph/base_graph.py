@@ -1,9 +1,8 @@
-import json
 import warnings
 from functools import partial
 
 import numpy as np
-from cbp.node import FactorNode, VarNode
+from cbp.node import VarNode
 from cbp.utils import (Message, diff_max_marginals,
                        engine_loop)
 from cbp.utils.np_utils import (nd_expand, ndarray_denominator, nd_multiexpand,
@@ -20,7 +19,7 @@ except BaseException:
 class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
         self.varnode_recorder = {}
-        self.constrained_recorder = []
+        self.constrained_names = []
         self.leaf_nodes = []
         self.factornode_recorder = {}
         self.node_recorder = {}
@@ -33,7 +32,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.silent = silent
 
     def add_varnode(self, node):
-        """add one `cbp.node.VarNode` to this graph, idx follow the increasing
+        """add one `~cbp.node.VarNode` to this graph, idx follow the increasing
         order
 
         :param node: one VarNode
@@ -47,7 +46,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.varnode_recorder[varnode_name] = node
         self.node_recorder[varnode_name] = node
         if node.isconstrained:
-            self.constrained_recorder.append(varnode_name)
+            self.constrained_names.append(varnode_name)
 
         self.cnt_varnode += 1
         return varnode_name
@@ -124,14 +123,30 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def first_belief_propagation(self):
         for node in self.nodes:
             for recipient_name in node.connections:
-                val = node.make_init_message(recipient_name)
-                message = Message(node, val)
-                self.node_recorder[recipient_name].store_message(message)
+                if recipient_name not in self.node_recorder:
+                    val = node.make_init_message(recipient_name)
+                    message = Message(node, val)
+                    self.node_recorder[recipient_name].store_message(message)
+
+    def copy_bp_initialization(self, another_graph):
+        """copy message setup from the another graph has same structure
+
+        :param another_graph: another graph which close to the optimal point
+        :type another_graph: BaseGraph
+        """
+        # TODO: copy safety!!!
+        for node in self.nodes:
+            if node.name in another_graph.node_recorder:
+                another_node = another_graph.node_recorder[node.name]
+                node.message_inbox = another_node.message_inbox
+                node.latest_message = another_node.latest_message
+            else:
+                raise f"{node.name} not in this graph"
 
     def __init_sinkhorn_node(self):
         varnode_names = list(self.varnode_recorder.keys())
         self.sinkhorn_node_coef = {}  # pylint: disable=attribute-defined-outside-init
-        for node_name in self.constrained_recorder:
+        for node_name in self.constrained_names:
             node_instance = self.varnode_recorder[node_name]
             self.sinkhorn_node_coef[node_name] = {
                 'index': varnode_names.index(node_name),
@@ -173,7 +188,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             node.sinkhorn = marginal
 
     def check_sinkhorn(self):
-        if len(self.constrained_recorder) == 0:
+        if len(self.constrained_names) == 0:
             raise RuntimeError(
                 "There is no constrained nodes, use brutal force")
 
@@ -220,6 +235,20 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             raise RuntimeError(f"{name_str} is illegal, not in this graph")
         return self.node_recorder[name_str]
 
+    def cal_bethe(self, margin):
+        """calculate bethe energy
+
+        :param margin: node_name : margin
+        :type margin: dict
+        :return: KL divergence between expoert joint dist and p_graph
+        :rtype: float
+        """
+        sum_item = []
+        for node in self.nodes:
+            sum_item.append(node.cal_bethe(margin[node.name]))
+
+        return np.sum(sum_item)
+
     def delete_node(self, name_str):
         """delete node from graph, needs to check following
 
@@ -253,8 +282,36 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             node, VarNode) else self.factornode_recorder
         del target_map[node.name]
         del self.node_recorder[node.name]
-        if node.name in self.constrained_recorder:
-            self.constrained_recorder.remove(node.name)
+        if node.name in self.constrained_names:
+            self.constrained_names.remove(node.name)
+
+    def set_node(self, node_name, potential=None, isconstrained=None):
+        """change node property
+        1. check whether or not in recorder
+        2. change potential easily[this may a duplicate function]
+        3. change isconstrained if possible, delete from recorder
+
+        :param node_name: [description]
+        :type node_name: [type]
+        :param potential: [description], defaults to None
+        :type potential: [type], optional
+        :param isconstrained: [description], defaults to None
+        :type isconstrained: [type], optional
+        :raises RuntimeError: [description]
+        """
+        if node_name not in self.node_recorder:
+            raise RuntimeError
+        node = self.node_recorder[node_name]
+        if potential is not None:
+            # TODO: make potential property check, when do set
+            node.potential = potential
+        if isconstrained is not None:
+            if node.isconstrained != isconstrained:
+                node.isconstrained = isconstrained
+                if isconstrained:
+                    self.constrained_names.append(node_name)
+                else:
+                    self.constrained_names.remove(node_name)
 
     def export_marginals(self):
         """export the marginal for variable nodes
@@ -292,7 +349,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         if pygraphviz is not None:
             graph = pygraphviz.AGraph(directed=False)
             for varnode_name in self.varnode_recorder:
-                if varnode_name in self.constrained_recorder:
+                if varnode_name in self.constrained_names:
                     graph.add_node(varnode_name, color='red', style='filled')
                 else:
                     graph.add_node(varnode_name, color='blue', style='bold')
@@ -306,52 +363,3 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             graph.draw(png_name)
         else:
             raise ValueError("must have pygraphviz installed for visualization")
-
-    def to_json(self, separators=(',', ':'), indent=4):
-        return json.dumps({
-            'class': 'GraphModel',
-            'varnodes': [json.loads(node.to_json())
-                         for node in self.varnode_recorder.values()],
-            'factornodes': [json.loads(node.to_json())
-                            for node in self.factornode_recorder.values()],
-        }, separators=separators, indent=indent)
-
-    @classmethod
-    def from_json(cls, j):
-        d_context = json.loads(j)
-
-        if d_context['class'] != 'GraphModel':
-            raise IOError(
-                f"Need a GraphModel class json to construct GraphModel\
-                     instead of {d_context['class']}")
-        varnodes = [VarNode.from_json(json.dumps(info))
-                    for info in d_context['varnodes']]
-        factornodes = [
-            FactorNode.from_json(
-                json.dumps(info)) for info in d_context['factornodes']]
-
-        graph = cls()
-        for node in varnodes:
-            graph.varnode_recorder[node.name] = node
-            if node.isconstrained:
-                graph.constrained_recorder.append(node.name)
-        for node in factornodes:
-            graph.factornode_recorder[node.name] = node
-
-        return graph
-
-    def __eq__(self, value):
-        if isinstance(value, type(self)):
-            flag = []
-            for varnode_name in self.varnode_recorder:
-                flag.append(
-                    self.varnode_recorder[varnode_name] == value.varnode_recorder[varnode_name])
-            flag.append(self.constrained_recorder == value.constrained_recorder)
-            for factornode_name in self.factornode_recorder:
-                flag.append(
-                    self.factornode_recorder[factornode_name]
-                    == value.factornode_recorder[factornode_name])
-            if np.sum(flag) == len(flag):
-                return True
-
-        return False

@@ -4,8 +4,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.random import RandomState
 import seaborn as sns
+from numpy.random import RandomState
+from numba import jit
+
 from cbp.utils.np_utils import empirical_marginal
 
 
@@ -16,26 +18,80 @@ class PotentialType(str, Enum):
     TRANSITION = 'Transition'
     EMISSION = 'Emission'
 
+@jit(cache=True, nopython=True)
+def cal_single(traj, col_num, state_num):
+    idx = traj[:, col_num:col_num + 2]
+    empty = np.zeros((state_num, state_num))
+    for i, j in zip(idx[:, 0], idx[:, 1]):
+        empty[i, j] += 1
+    return empty / traj.shape[0]
 
-class HMMSimulator:  # pylint: disable=too-many-instance-attributes
-    """simulator from a time-homogenous process.\
-        The setup need:
+class HMMSimDate(dict):
+    def __init__(self, time_step, state_num, obser_num, *args, **kwargs): #pylint: disable=super-init-not-called
+        self.time_step = time_step
+        self.state_num = state_num
+        self.obser_num = obser_num
 
-        * potential: type in the `cbp.builder.PotentialType`, register various potential
-        * change to a distinguishable name
-        * call sample methods
-    """
+        self.update(*args, **kwargs)
 
-    def __init__(self, time_step, dim_status, dim_observations, random_seed):  # pylint: disable=too-many-function-args
+    @property
+    def traj(self):
+        return dict.__getitem__(self, "traj")
+
+    @traj.setter
+    def traj(self, traj_data):
+        assert traj_data.shape[1] == self.time_step
+        dict.__setitem__(self, "traj", traj_data)
+        dict.__setitem__(self, "gt_margin", empirical_marginal(
+            traj_data, self.state_num))
+        self._cal_joint()
+
+    @property
+    def sensor(self):
+        return dict.__getitem__(self, "sensor")
+
+    @sensor.setter
+    def sensor(self, sensor_data):
+        assert sensor_data.shape[1] == self.time_step
+        dict.__setitem__(self, "sensor", sensor_data)
+        dict.__setitem__(self, "fix_margin", empirical_marginal(
+            self["sensor"], self.obser_num))
+
+    def _cal_joint(self):
+        record = []
+        for i in range(self.time_step - 1):
+            record.append(cal_single(self["traj"], i, self.state_num))
+        self["gt_joint"] = record
+
+    def cal_theory(self, verbose):
+        transition = self[PotentialType.TRANSITION].T
+        init = self[PotentialType.INIT].reshape(-1, 1)
+        state_record = []
+        observation_record = []
+        for _ in range(self.time_step):
+            state_record.append(init.flatten())
+            observation_record.append(
+                (self[PotentialType.EMISSION].T@init).flatten())
+            init = transition @ init
+        self["th_margin"] = np.array(state_record)
+        self["th_observation"] = np.array(observation_record)
+        if verbose:
+            err = (
+                self["th_margin"] -
+                self["gt_margin"]).sum()
+            self["sim_error"] = err
+            print(f"Sim err: {err}")
+
+
+class HMMSimulator:  # pylint: disable=too-many-public-methods
+    def __init__(self, time_step, dim_states, dim_observations, random_seed, is_theorem=False):  # pylint: disable=too-many-arguments
         self.__name = None
         self.path = Path('data/sim')
         self.path.mkdir(parents=True, exist_ok=True)
-        self.time_step = time_step
-        self.status_d = dim_status
-        self.obser_d = dim_observations
+        self.is_theorem = is_theorem
         self.rng = RandomState(random_seed)
 
-        self._prcs = {}
+        self.record = HMMSimDate(time_step, dim_states, dim_observations)
 
     @property
     def name(self):
@@ -60,15 +116,17 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         if ptype == PotentialType.TRANSITION:
             assert np.isclose(potential.sum(axis=1), 1).all(),\
                 "potential should be a conditional distribution"
-            assert potential.shape == (self.status_d, self.status_d)
+            assert potential.shape == (
+                self.record.state_num, self.record.state_num)
         elif ptype == PotentialType.EMISSION:
             assert np.isclose(potential.sum(axis=1), 1).all(),\
                 "potential should be a conditional distribution"
-            assert potential.shape == (self.status_d, self.obser_d)
+            assert potential.shape == (
+                self.record.state_num, self.record.obser_num)
         elif ptype == PotentialType.INIT:
-            assert potential.shape == (self.status_d,)
+            assert potential.shape == (self.record.state_num,)
 
-        self._prcs[ptype] = potential
+        self.record[ptype] = potential
 
     def sample_engine(self, state, dim, potential):
         """sample according to conditional prob table
@@ -82,77 +140,96 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         :return: next state or observation
         :rtype: int
         """
-        assert state < self.status_d
+        assert state < self.record.state_num
         conditional_prob = potential[state, :]
         next_state = self.rng.choice(
             dim, p=conditional_prob)
         return next_state
 
     def step(self, state):
-        """do a status transition sample
+        """do a states transition sample
 
-        :param state: current status
+        :param state: current states
         :type state: int
-        :return: the next status
+        :return: the next states
         :rtype: int
         """
-        return self.sample_engine(state, self.status_d,
-                                  self._prcs[PotentialType.TRANSITION])
+        return self.sample_engine(state, self.record.state_num,
+                                  self.record[PotentialType.TRANSITION])
 
     def observe(self, state):
         """do a emission sample
 
-        :param state: current status
+        :param state: current states
         :type state: int
-        :return: the observation of cur status
+        :return: the observation of cur states
         :rtype: int
         """
-        return self.sample_engine(state, self.obser_d,
-                                  self._prcs[PotentialType.EMISSION])
+        return self.sample_engine(state, self.record.obser_num,
+                                  self.record[PotentialType.EMISSION])
 
-    def __init_stats_sampler(self):  # pylint: disable=no-self-use
-        return self.rng.choice(self.status_d, p=self._prcs[PotentialType.INIT])
+    def __init_stats_sampler(self):
+        return self.rng.choice(self.record.state_num,
+                               p=self.record[PotentialType.INIT])
 
     def sample(self, num_sample):
-        """start simulation process with many particles
-
-        :param num_sample: num of particles
-        :type num_sample: int
-        """
-        self._prcs["num_sample"] = num_sample
+        self.record["num_sample"] = num_sample
         traj_recorder = []
         sensor_recorder = []
         for _ in range(num_sample):
             states = []
             sensors = []
             single_state = self.__init_stats_sampler()
-            for _ in range(self.time_step):
+            for _ in range(self.record.time_step):
                 sensors.append(self.observe(single_state))
                 states.append(single_state)
                 single_state = self.step(single_state)
             traj_recorder.append(states)
             sensor_recorder.append(sensors)
 
-        self._prcs["traj"] = np.array(
-            traj_recorder).reshape(num_sample, self.time_step)
-        self._prcs["sensor"] = np.array(sensor_recorder).reshape(
-            num_sample, self.time_step)
+        self.record.traj = np.array(traj_recorder).reshape(num_sample, -1)
+        self.record.sensor = np.array(sensor_recorder).reshape(num_sample, -1)
+
+        self.get_precious()
+
+    def reset(self):
+        for key in ["traj", "sensor", "fix_margin", "gt_margin", "gt_joint"]:
+            if key in self.record:
+                del self.record[key]
 
     def viz_emission_potential(self):
-        axes = sns.heatmap(self._prcs[PotentialType.EMISSION])
+        axes = sns.heatmap(self.record[PotentialType.EMISSION])
         axes.set_title("Emission Potential")
         fig = axes.get_figure()
         fig.savefig(f"{self.path}/hmm_emission.png")
         plt.close(fig)
 
     def viz_trans_potential(self):
-        axes = sns.heatmap(self._prcs[PotentialType.TRANSITION])
+        axes = sns.heatmap(self.record[PotentialType.TRANSITION])
         axes.set_title("Transition Potential")
         fig = axes.get_figure()
         fig.savefig(f"{self.path}/hmm_transition.png")
         plt.close(fig)
 
-    def get_constrained_marginal(self, time_step=None):
+    def viz_gt(self):
+        gt_margin = self.get_hidden_margin()
+        axes = sns.heatmap(gt_margin.T)
+        axes.set_title("Evolution of distribution")
+        axes.set_xlabel("time")
+        fig = axes.get_figure()
+        fig.savefig(f"{self.path}/gt.png")
+        plt.close(fig)
+
+    def viz_sensor(self):
+        sensor = self.get_fix_margin()
+        axes = sns.heatmap(sensor.T)
+        axes.set_title("Evolution of distribution")
+        axes.set_xlabel("time")
+        fig = axes.get_figure()
+        fig.savefig(f"{self.path}/sensor.png")
+        plt.close(fig)
+
+    def get_fix_margin(self, time_step=None):
         """return observation marginal
 
         :param time_step: if int then return a specific time distribution
@@ -161,16 +238,13 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         :return: array for single time_step or a matrix
         :rtype: ndarray
         """
-        if "constrained_marginal" not in self._prcs:
-            self._prcs["constrained_marginal"] = empirical_marginal(
-                self._prcs["sensor"], self.obser_d)
-
+        key_word = "th_observation" if self.is_theorem else "fix_margin"
         if isinstance(time_step, int):
-            return self._prcs["constrained_marginal"][time_step, :]
+            return self.record[key_word][time_step, :]
 
-        return self._prcs["constrained_marginal"]
+        return self.record[key_word]
 
-    def get_gt_marginal(self, time_step=None):
+    def get_hidden_margin(self, time_step=None):
         """return ground truth marginal
 
         :param time_step: if int then return a specific time distribution
@@ -179,24 +253,50 @@ class HMMSimulator:  # pylint: disable=too-many-instance-attributes
         :return: array for single time_step or a matrix
         :rtype: ndarray
         """
-        if "gt_marginal" not in self._prcs:
-            self._prcs["gt_marginal"] = empirical_marginal(
-                self._prcs["traj"], self.status_d)
-
+        key_word = "th_margin" if self.is_theorem else "gt_margin"
         if isinstance(time_step, int):
-            return self._prcs["gt_marginal"][time_step, :]
+            return self.record[key_word][time_step, :]
 
-        return self._prcs["gt_marginal"]
+        return self.record[key_word]
 
-    def get_tansition_potential(self):
-        return self._prcs[PotentialType.TRANSITION]
+    def get_traj(self):
+        return self.record["traj"]
+
+    def get_sensor(self):
+        return self.record["sensor"]
+
+    def get_gt_joint(self):
+        return self.record["gt_joint"]
+
+    def get_transition_potential(self):
+        return self.record[PotentialType.TRANSITION]
 
     def get_emission_potential(self):
-        return self._prcs[PotentialType.EMISSION]
+        return self.record[PotentialType.EMISSION]
+
+    def get_init_potential(self):
+        return self.record[PotentialType.INIT]
+
+    def get_precious(self, time_step=None, verbose=False):
+        """return previous marginal
+
+        :param time_step: if int then return a specific time distribution
+        otherwise all distributions as matrix, defaults to None
+        :type time_step: int, optional
+        :param verbose: whether or not ouput difference between simulation and
+                        theorical margin
+        :return: array for single time_step or a matrix
+        :rtype: ndarray
+        """
+        if "th_margin" not in self.record:
+            self.record.cal_theory(verbose)
+
+        if isinstance(time_step, int):
+            return self.record["th_margin"][time_step, :]
+
+        return self.record["th_margin"]
 
     def save(self):
-        """save the instance to a pkl
-        """
         sim_path = f"{self.path}/sim.pkl"
         with open(sim_path, 'wb') as handle:
             pickle.dump(self, handle)

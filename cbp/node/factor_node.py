@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 from cbp.utils.np_utils import nd_expand, ndarray_denominator
 
@@ -44,6 +42,9 @@ class FactorNode(BaseNode):
                     potential: {self.potential.shape[i]}"
             self.last_innerparenthese_msg[varnode_name] = np.ones(
                 self.potential.shape)
+
+    def _check_potential(self, potential):
+        return potential / np.sum(potential)
 
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)
@@ -117,6 +118,10 @@ class FactorNode(BaseNode):
                 recipient_node),
             hat_c_ialpha)
 
+    def cal_bethe(self, margin):
+        clip_potential = np.clip(self.potential, 1e-12, np.inf)
+        return np.sum(margin * np.log(margin / clip_potential))
+
     def marginal(self):
         message_val = np.array([message.val for message in self.latest_message])
         prod_messages = np.prod(message_val, axis=0)
@@ -160,42 +165,3 @@ class FactorNode(BaseNode):
         assert potential_dim[node_index] == node.rv_dim
         return potential.sum(
             tuple(j for j in range(potential.ndim) if j != node_index))
-
-    def to_json(self, separators=(',', ':'), indent=4):
-        return json.dumps({
-            'class': 'FactorNode',
-            'name': self.name,
-            'potential': self.potential.tolist(),
-            'node_coef': self.node_coef,
-            'connections': self.connections
-        }, separators=separators, indent=indent)
-
-    def __eq__(self, value):
-        if isinstance(value, FactorNode):
-            flag = []
-            flag.append(self.name == value.name)
-            flag.append(np.array_equal(self.potential, value.potential))
-            flag.append(np.array_equal(self.node_coef, value.node_coef))
-            flag.append(self.connections == value.connections)
-            if np.sum(flag) == len(flag):
-                return True
-
-        return False
-
-    @classmethod
-    def from_json(cls, json_file):
-        d_context = json.loads(json_file)
-
-        if d_context['class'] != 'FactorNode':
-            raise IOError(
-                f"Need a FactorNode class json to construct FactorNode \
-                instead of {d_context['class']}")
-
-        potential = d_context['potential']
-        coef = d_context['node_coef']
-        connections = d_context['connections']
-        node = cls(connections, np.asarray(potential), coef=coef)
-
-        node.format_name(d_context['name'])
-
-        return node
