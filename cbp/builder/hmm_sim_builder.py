@@ -6,7 +6,7 @@ from .hmm_builder import HMMBuilder
 class HMMSimBuilder(HMMBuilder):
     def __init__(self, length, simulator, policy,
                  random_seed=1):
-        super().__init__(length, simulator.states_num, policy, random_seed)
+        super().__init__(length, simulator.record.state_num, policy, random_seed)
         self.simulator = simulator
         self.cnt_constrained_node = 0
 
