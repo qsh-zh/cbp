@@ -48,7 +48,8 @@ setup(
         'scipy',
         'matplotlib',
         'seaborn',
-        'pygraphviz'
+        'pygraphviz',
+        'numba'
     ],
     extras_require={
         'dev': [

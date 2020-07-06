@@ -18,6 +18,7 @@ class PotentialType(str, Enum):
     TRANSITION = 'Transition'
     EMISSION = 'Emission'
 
+
 @jit(cache=True, nopython=True)
 def cal_single(traj, col_num, state_num):
     idx = traj[:, col_num:col_num + 2]
@@ -26,8 +27,9 @@ def cal_single(traj, col_num, state_num):
         empty[i, j] += 1
     return empty / traj.shape[0]
 
+
 class HMMSimDate(dict):
-    def __init__(self, time_step, state_num, obser_num, *args, **kwargs): #pylint: disable=super-init-not-called
+    def __init__(self, time_step, state_num, obser_num, *args, **kwargs):  # pylint: disable=super-init-not-called
         self.time_step = time_step
         self.state_num = state_num
         self.obser_num = obser_num
@@ -71,7 +73,7 @@ class HMMSimDate(dict):
         for _ in range(self.time_step):
             state_record.append(init.flatten())
             observation_record.append(
-                (self[PotentialType.EMISSION].T@init).flatten())
+                (self[PotentialType.EMISSION].T @ init).flatten())
             init = transition @ init
         self["th_margin"] = np.array(state_record)
         self["th_observation"] = np.array(observation_record)
