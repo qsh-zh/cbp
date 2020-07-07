@@ -5,6 +5,7 @@ __pycache__/
 docs/_build
 data/
 .vscode/
+tmp
 
 # C extensions
 *.so
