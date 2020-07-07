@@ -83,11 +83,14 @@ class GraphModel(BaseGraph):
     def itsbp_outer_counting(self):
         self.itsbp_outer_cnt += 1
 
+        # if self.itsbp_outer_cnt == len(self.leaf_nodes):
+        #     self.itsbp_outer_cnt = 0
+        #     self.leaf_nodes.reverse()
+
         self.itsbp_outer_cnt %= len(self.leaf_nodes)
 
     def its_next_looplink(self):
         target_node = self.leaf_nodes[self.itsbp_outer_cnt]
-        # target_node.sendout_message()
 
         next_node = self.leaf_nodes[(
             self.itsbp_outer_cnt + 1) % len(self.leaf_nodes)]
@@ -114,6 +117,7 @@ class GraphModel(BaseGraph):
                 target_var.sendout_message(self.silent)
 
     def two_pass(self):
+        # TODO: remove!
         self.init_cnp_coef()
         self.first_belief_propagation()
         for node in self.nodes:
