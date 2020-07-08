@@ -7,7 +7,7 @@ from cbp.utils import (Message, diff_max_marginals,
                        engine_loop)
 from cbp.utils.np_utils import (nd_expand, ndarray_denominator, nd_multiexpand,
                                 reduction_ndarray)
-
+from cbp.configs.base_config import baseconfig
 from .coef_policy import bp_policy
 from .graph_utils import cal_marginal_from_tensor
 try:
@@ -17,7 +17,8 @@ except BaseException:
 
 
 class BaseGraph():  # pylint: disable=too-many-instance-attributes
-    def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
+    def __init__(self, silent=True, epsilon=1,
+                 coef_policy=bp_policy, config=baseconfig):
         self.varnode_recorder = {}
         self.constrained_names = []
         self.leaf_nodes = []
@@ -27,6 +28,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.coef_policy = coef_policy
         self.cnt_varnode = 0
         self.cnt_factornode = 0
+        self.cfg = config
 
         # debug utils
         self.silent = silent

@@ -2,6 +2,7 @@ from functools import partial
 
 from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop)
+from cbp.configs.base_config import baseconfig
 
 from .base_graph import BaseGraph
 from .coef_policy import bp_policy
@@ -9,8 +10,10 @@ from .graph_utils import itsbp_inner_loop, find_link
 
 
 class GraphModel(BaseGraph):
-    def __init__(self, silent=True, epsilon=1, coef_policy=bp_policy):
-        super().__init__(silent=silent, epsilon=epsilon, coef_policy=coef_policy)
+    def __init__(self, silent=True, epsilon=1,
+                 coef_policy=bp_policy, config=baseconfig):
+        super().__init__(config=config, silent=silent,
+                         epsilon=epsilon, coef_policy=coef_policy)
         self.itsbp_outer_cnt = 0
 
     def init_cnp_coef(self):
@@ -80,22 +83,14 @@ class GraphModel(BaseGraph):
                                 error_fun=diff_max_marginals,
                                 isoutput=False)
 
-    def itsbp_outer_counting(self):
-        self.itsbp_outer_cnt += 1
-
-        # if self.itsbp_outer_cnt == len(self.leaf_nodes):
-        #     self.itsbp_outer_cnt = 0
-        #     self.leaf_nodes.reverse()
-
-        self.itsbp_outer_cnt %= len(self.leaf_nodes)
-
     def its_next_looplink(self):
         target_node = self.leaf_nodes[self.itsbp_outer_cnt]
 
         next_node = self.leaf_nodes[(
             self.itsbp_outer_cnt + 1) % len(self.leaf_nodes)]
 
-        self.itsbp_outer_counting()
+        self.itsbp_outer_cnt = self.cfg.itsbp_schedule(
+            self.itsbp_outer_cnt, self.leaf_nodes)
         return target_node, find_link(target_node, next_node)
 
     def itsbp_outer_loop(self):
