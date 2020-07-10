@@ -108,15 +108,17 @@ class FactorNode(BaseNode):
 
         product_out = self.cal_inner_parentheses(recipient_node)
 
-        hat_c_ialpha = self.hat_c_ialpha[recipient_node.name]
-        log_media = 1.0 / hat_c_ialpha * np.log(product_out)
-        product_out_power = np.exp(
-            log_media - np.max(np.nan_to_num(log_media)))
-        return np.power(
-            self.summation(
-                product_out_power,
-                recipient_node),
-            hat_c_ialpha)
+        with np.errstate(divide='raise'):
+            hat_c_ialpha = self.hat_c_ialpha[recipient_node.name]
+            log_media = 1.0 / hat_c_ialpha * \
+                np.log(np.clip(product_out, 1e-12, 10))
+            product_out_power = np.exp(
+                log_media - np.max(np.nan_to_num(log_media)))
+            return np.power(
+                self.summation(
+                    product_out_power,
+                    recipient_node),
+                hat_c_ialpha)
 
     def cal_bethe(self, margin):
         clip_potential = np.clip(self.potential, 1e-12, np.inf)

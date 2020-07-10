@@ -114,7 +114,6 @@ class TestITSbp(unittest.TestCase):
             self.assertTrue(
                 all(sinkhorn_bp_equal(self.graph, len_node=num_node)))
 
-    @unittest.skip("Expensive test!")
     def test_zero_hmm(self):
         graph = HMMZeroBuilder(3, 3, bp_policy)()
         graph.sinkhorn()

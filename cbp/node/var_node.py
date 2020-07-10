@@ -69,9 +69,9 @@ class VarNode(BaseNode):
             else:
                 potential_part = 1.0 / self.hat_c_i * np.log(self.potential)
                 message_part = 1.0 / self.hat_c_i * \
-                    np.log(np.prod(vals, axis=0))
+                    np.log(np.clip(np.prod(vals, axis=0), 1e-12, 1e12))
                 log_numerator = potential_part + message_part
-            clip_base = vals[recipient_index_in_var]
+            clip_base = np.clip(vals[recipient_index_in_var], 1e-12, 1e12)
             log_denominator = 1.0 / hat_c_ialpha * np.log(clip_base)
 
             log_base = c_alpha * (log_numerator - log_denominator)

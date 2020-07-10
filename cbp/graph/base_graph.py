@@ -180,7 +180,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
 
             copy_denominator = reduction_ndarray(
                 normalized_denominator, recorder['index'])
-            copy_denominator = ndarray_denominator(copy_denominator)
+            copy_denominator = np.clip(copy_denominator, 1e-12, 1e12)
             recorder['u'] = recorder['u'] * recorder['mu'] / copy_denominator
 
         varnodes = list(self.varnode_recorder.values())

@@ -144,8 +144,7 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
         """
         assert state < self.record.state_num
         conditional_prob = potential[state, :]
-        next_state = self.rng.choice(
-            dim, p=conditional_prob)
+        next_state = self.rng.choice(dim, p=conditional_prob)
         return next_state
 
     def step(self, state):
@@ -177,22 +176,25 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
     def sample(self, num_sample):
         self.record["num_sample"] = num_sample
         traj_recorder = []
-        sensor_recorder = []
         for _ in range(num_sample):
             states = []
-            sensors = []
             single_state = self.__init_stats_sampler()
             for _ in range(self.record.time_step):
-                sensors.append(self.observe(single_state))
                 states.append(single_state)
                 single_state = self.step(single_state)
             traj_recorder.append(states)
-            sensor_recorder.append(sensors)
 
         self.record.traj = np.array(traj_recorder).reshape(num_sample, -1)
-        self.record.sensor = np.array(sensor_recorder).reshape(num_sample, -1)
+        self.record.sensor = self.observe_traj(self.record.traj)
 
         self.get_precious()
+
+    def observe_traj(self, traj):
+        rtn = np.zeros_like(traj)
+        it = np.nditer(traj, flags=['multi_index'])
+        for i in it:
+            rtn[it.multi_index] = self.observe(i)
+        return rtn
 
     def reset(self):
         for key in ["traj", "sensor", "fix_margin", "gt_margin", "gt_joint"]:
@@ -302,6 +304,7 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
         sim_path = f"{self.path}/sim.pkl"
         with open(sim_path, 'wb') as handle:
             pickle.dump(self, handle)
+        print(f"saving to {self.name}")
 
     @classmethod
     def load(cls, sim_name: str):
