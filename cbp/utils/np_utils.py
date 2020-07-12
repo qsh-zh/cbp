@@ -1,4 +1,5 @@
 import numpy as np
+from numba import njit
 
 
 def nd_multiexpand(input_data, target_shape, which_dims):
@@ -38,6 +39,7 @@ def nd_expand(inputdata, target_shape, expand_dim):
     return nd_multiexpand(in_, target_shape, dims)
 
 
+@njit
 def reduction_ndarray(ndarray, reduction_index):
     """reduct ndarray according to one index
 
@@ -48,13 +50,10 @@ def reduction_ndarray(ndarray, reduction_index):
     :return: [description]
     :rtype: ndarray
     """
-    sum_dims = [j for j in range(ndarray.ndim) if not j == reduction_index]
-    sum_dims.sort(reverse=True)
-    collapsing_marginal = ndarray
-    for cur_dim in sum_dims:
-        collapsing_marginal = collapsing_marginal.sum(cur_dim)  # lose 1 dim
-
-    return collapsing_marginal
+    rtn = np.zeros(ndarray.shape[reduction_index])
+    for idx, x in np.ndenumerate(ndarray):
+        rtn[idx[reduction_index]] += x
+    return rtn
 
 
 def ndarray_denominator(ndarray):
