@@ -5,7 +5,7 @@ import numpy as np
 from cbp.node import VarNode
 from cbp.utils import (Message, diff_max_marginals,
                        engine_loop)
-from cbp.utils.np_utils import (nd_expand, ndarray_denominator, nd_multiexpand,
+from cbp.utils.np_utils import (nd_expand, nd_multiexpand,
                                 reduction_ndarray)
 from cbp.configs.base_config import baseconfig
 from .coef_policy import bp_policy

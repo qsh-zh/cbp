@@ -1,5 +1,5 @@
 import numpy as np
-from cbp.utils.np_utils import nd_expand, ndarray_denominator
+from cbp.utils.np_utils import nd_expand
 
 from .base_node import BaseNode
 
@@ -97,7 +97,7 @@ class FactorNode(BaseNode):
         coef_exp = -1.0 * \
             self.i_alpha[node_name] / self.hat_c_ialpha[node_name]
         base = self.last_innerparenthese_msg[node_name]
-        value = np.power(ndarray_denominator(base), coef_exp)
+        value = np.power(base, coef_exp)
         return value
 
     def make_message(self, recipient_node):

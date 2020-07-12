@@ -75,7 +75,7 @@ class VarNode(BaseNode):
             log_denominator = 1.0 / hat_c_ialpha * np.log(clip_base)
 
             log_base = c_alpha * (log_numerator - log_denominator)
-            log_base = log_base - np.max(np.nan_to_num(log_base))
+            # log_base = log_base - np.max(np.nan_to_num(log_base))
             return np.exp(log_base)
 
     def make_message_bp(self, recipient_node):

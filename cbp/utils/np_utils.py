@@ -35,6 +35,7 @@ def nd_expand(inputdata, target_shape, expand_dim):
                 [2,2,2]
             ])
     """
+    assert inputdata.ndim == 1
     rtn = np.zeros(target_shape)
     for idx in np.ndindex(target_shape):
         rtn[idx] = inputdata[idx[expand_dim]]
@@ -53,19 +54,12 @@ def reduction_ndarray(ndarray, reduction_index):
     :rtype: ndarray
     """
     rtn = np.zeros(ndarray.shape[reduction_index])
-    for idx, x in np.ndenumerate(ndarray):
-        rtn[idx[reduction_index]] += x
+    for idx, value in np.ndenumerate(ndarray):
+        rtn[idx[reduction_index]] += value
     return rtn
 
+
 @njit
-def ndarray_denominator(ndarray):
-    check_index = np.isclose(ndarray, 0)
-    if check_index.any():
-        print("used")
-        ndarray[check_index] = np.inf
-    return ndarray
-
-
 def batch_normal_angle(angle):
     delta_x = np.cos(angle)
     delta_y = np.sin(angle)
