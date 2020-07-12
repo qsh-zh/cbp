@@ -77,12 +77,15 @@ class HMMSimDate(dict):
             init = transition @ init
         self["th_margin"] = np.array(state_record)
         self["th_observation"] = np.array(observation_record)
+        state_err = np.linalg.norm(self["th_margin"] -
+                                   self["gt_margin"])
+        obser_err = np.linalg.norm(self["th_observation"] -
+                                   self["fix_margin"])
+        self["sim_state_error"] = state_err
+        self["sim_obser_error"] = obser_err
         if verbose:
-            err = (
-                self["th_margin"] -
-                self["gt_margin"]).sum()
-            self["sim_error"] = err
-            print(f"Sim err: {err}")
+            print(f"Sim state err: {state_err}")
+            print(f"Sim obser err: {obser_err}")
 
 
 class HMMSimulator:  # pylint: disable=too-many-public-methods
@@ -282,7 +285,7 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
         return self.record[PotentialType.INIT]
 
     def get_precious(self, time_step=None, verbose=False):
-        """return previous marginal
+        """return precious marginal
 
         :param time_step: if int then return a specific time distribution
         otherwise all distributions as matrix, defaults to None
