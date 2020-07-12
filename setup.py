@@ -10,7 +10,7 @@ with open(path.join(here, 'cbp', '__init__.py')) as f:
     version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
 
 setup(
-    name='cbp',
+    name='pycbp',
     version=version,
     description='A Library for Constrained Belief Propagation',
     long_description=open('README.md', encoding='utf8').read(),
@@ -49,7 +49,8 @@ setup(
         'matplotlib',
         'seaborn',
         'pygraphviz',
-        'numba'
+        'numba',
+        'hmmlearn'
     ],
     extras_require={
         'dev': [
