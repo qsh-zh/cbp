@@ -59,6 +59,7 @@ def reduction_ndarray(ndarray, reduction_index):
 
 
 def ndarray_denominator(ndarray):
+    return ndarray
     check_index = np.isclose(ndarray, 0)
     if check_index.any():
         print("used")
