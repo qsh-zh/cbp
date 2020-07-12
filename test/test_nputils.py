@@ -6,7 +6,7 @@ from cbp.utils.np_utils import nd_expand, nd_multiexpand
 
 class TestNpUtils(unittest.TestCase):
     def test_nd_expand(self):
-        inputdata = [1, 2]
+        inputdata = np.array([1, 2])
         target_shape = (1, 2, 3)
         expand_dim = 1
         output = nd_expand(inputdata, target_shape, expand_dim)

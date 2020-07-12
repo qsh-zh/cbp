@@ -14,6 +14,7 @@ def nd_multiexpand(input_data, target_shape, which_dims):
     return np.tile(out, tuple(expand_shape))
 
 
+@njit
 def nd_expand(inputdata, target_shape, expand_dim):
     """expand ndarray to target shape
 
@@ -34,9 +35,10 @@ def nd_expand(inputdata, target_shape, expand_dim):
                 [2,2,2]
             ])
     """
-    in_ = np.array(inputdata)
-    dims = [expand_dim]
-    return nd_multiexpand(in_, target_shape, dims)
+    rtn = np.zeros(target_shape)
+    for idx in np.ndindex(target_shape):
+        rtn[idx] = inputdata[idx[expand_dim]]
+    return rtn
 
 
 @njit
@@ -64,6 +66,7 @@ def ndarray_denominator(ndarray):
     return ndarray
 
 
+@njit
 def batch_normal_angle(angle):
     delta_x = np.cos(angle)
     delta_y = np.sin(angle)
