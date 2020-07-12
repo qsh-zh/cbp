@@ -35,6 +35,7 @@ def nd_expand(inputdata, target_shape, expand_dim):
                 [2,2,2]
             ])
     """
+    assert inputdata.ndim == 1
     rtn = np.zeros(target_shape)
     for idx in np.ndindex(target_shape):
         rtn[idx] = inputdata[idx[expand_dim]]
@@ -56,15 +57,6 @@ def reduction_ndarray(ndarray, reduction_index):
     for idx, x in np.ndenumerate(ndarray):
         rtn[idx[reduction_index]] += x
     return rtn
-
-
-def ndarray_denominator(ndarray):
-    return ndarray
-    check_index = np.isclose(ndarray, 0)
-    if check_index.any():
-        print("used")
-        ndarray[check_index] = np.inf
-    return ndarray
 
 
 @njit
