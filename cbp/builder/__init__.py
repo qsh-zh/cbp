@@ -1,4 +1,5 @@
 from .hmm_builder import HMMBuilder
+from .base_builder import BaseBuilder
 from .line_builder import LineBuilder
 from .star_builder import StarBuilder
 from .tree_builder import TreeBuilder
@@ -12,6 +13,7 @@ from .hmm_engine import HMMEngine
 
 __all__ = [
     "HMMBuilder",
+    "BaseBuilder",
     "LineBuilder",
     "StarBuilder",
     "TreeBuilder",

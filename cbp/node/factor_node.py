@@ -131,7 +131,7 @@ class FactorNode(BaseNode):
         unormalized = np.power(
             product_out / np.sum(product_out),
             1.0 / self.node_coef)
-        return unormalized
+        return unormalized / np.sum(unormalized)
 
     def cal_inner_parentheses(self, recipient_node):
         latest_message = self.latest_message
