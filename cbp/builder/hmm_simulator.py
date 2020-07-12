@@ -194,9 +194,9 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
 
     def observe_traj(self, traj):
         rtn = np.zeros_like(traj)
-        it = np.nditer(traj, flags=['multi_index'])
-        for i in it:
-            rtn[it.multi_index] = self.observe(i)
+        loop_iter = np.nditer(traj, flags=['multi_index'])
+        for i in loop_iter:
+            rtn[loop_iter.multi_index] = self.observe(i)
         return rtn
 
     def reset(self):

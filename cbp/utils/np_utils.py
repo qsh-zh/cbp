@@ -54,8 +54,8 @@ def reduction_ndarray(ndarray, reduction_index):
     :rtype: ndarray
     """
     rtn = np.zeros(ndarray.shape[reduction_index])
-    for idx, x in np.ndenumerate(ndarray):
-        rtn[idx[reduction_index]] += x
+    for idx, value in np.ndenumerate(ndarray):
+        rtn[idx[reduction_index]] += value
     return rtn
 
 
