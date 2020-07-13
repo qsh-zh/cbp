@@ -75,7 +75,7 @@ class TestITSbp(unittest.TestCase):
 
     def _profile_hmm_schedule(self, cfg=None):
         rng = np.random.RandomState(1)
-        for _ in range(1):
+        for _ in range(10):
             num_node = int(rng.randint(13, 15))
             node_dim = int(rng.randint(4, 8))
             graph = HMMBuilder(num_node, node_dim, bp_policy)()
@@ -88,8 +88,8 @@ class TestITSbp(unittest.TestCase):
         print(timeit.timeit(
             lambda: self._profile_hmm_schedule(
                 TestConfig()),
-            number=1))
-        print(timeit.timeit(lambda: self._profile_hmm_schedule(), number=1))
+            number=3))
+        print(timeit.timeit(lambda: self._profile_hmm_schedule(), number=3))
 
     def test_itsbp_line(self):
         rng = np.random.RandomState(1)
