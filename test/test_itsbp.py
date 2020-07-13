@@ -91,25 +91,24 @@ class TestITSbp(unittest.TestCase):
             number=1))
         print(timeit.timeit(lambda: self._profile_hmm_schedule(), number=1))
 
-    @unittest.skip("Expensive test!")
     def test_itsbp_line(self):
+        rng = np.random.RandomState(1)
         for _ in range(10):
-            num_node = int(np.random.randint(3, 10))
-            node_dim = int(np.random.randint(2, 5))
+            num_node = int(rng.randint(3, 10))
+            node_dim = int(rng.randint(2, 5))
             self.graph = LineBuilder(num_node, node_dim, bp_policy)()
             self.graph.run_bp()
             self.graph.sinkhorn()
             self.assertTrue(
                 all(sinkhorn_bp_equal(self.graph, len_node=num_node)))
 
-    @unittest.skip("Expensive test!")
     def test_itsbp_hmm(self):
+        rng = np.random.RandomState(1)
         for i in range(10):
-            num_node = int(np.random.randint(3, 6))
-            node_dim = int(np.random.randint(2, 5))
+            num_node = int(rng.randint(3, 6))
+            node_dim = int(rng.randint(2, 5))
             self.graph = HMMBuilder(num_node, node_dim, bp_policy)()
             self.graph.sinkhorn()
-            print(f"{i}-th test, run {node_dim} status with {num_node} nodes")
             self.graph.run_bp()
             self.assertTrue(
                 all(sinkhorn_bp_equal(self.graph, len_node=num_node)))
@@ -118,8 +117,7 @@ class TestITSbp(unittest.TestCase):
         graph = HMMZeroBuilder(3, 3, bp_policy)()
         graph.sinkhorn()
         graph.run_bp()
-        self.assertTrue(
-            all(sinkhorn_bp_equal(graph, len_node=3)))
+        self.assertTrue(all(sinkhorn_bp_equal(graph, len_node=3)))
 
 
 if __name__ == '__main__':

@@ -72,12 +72,6 @@ class GraphModel(BaseGraph):
         """
         self.init_cnp_coef()
         self.first_belief_propagation()
-
-        inner_bind = partial(self.parallel_message, False)
-        self.engine_loop(inner_bind,
-                         tolerance=1e-2,
-                         error_fun=diff_max_marginals)
-
         return self.engine_loop(self.itsbp_outer_loop,
                                 tolerance=1e-4,
                                 error_fun=diff_max_marginals,
