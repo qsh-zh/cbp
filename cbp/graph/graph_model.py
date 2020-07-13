@@ -90,12 +90,7 @@ class GraphModel(BaseGraph):
     def itsbp_outer_loop(self):
         for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
-            inner_fun = partial(itsbp_inner_loop, loop_link, self.silent)
-
-            self.engine_loop(inner_fun,
-                             tolerance=1e-3,
-                             error_fun=diff_max_marginals,
-                             isoutput=False)
+            itsbp_inner_loop(loop_link, self.silent)
 
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():
