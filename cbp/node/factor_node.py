@@ -111,7 +111,7 @@ class FactorNode(BaseNode):
         with np.errstate(divide='raise'):
             hat_c_ialpha = self.hat_c_ialpha[recipient_node.name]
             log_media = 1.0 / hat_c_ialpha * \
-                np.log(np.clip(product_out, 1e-12, 10))
+                np.log(np.clip(product_out, 1e-12, None))
             product_out_power = np.exp(log_media)
             return np.power(
                 self.summation(
@@ -120,7 +120,7 @@ class FactorNode(BaseNode):
                 hat_c_ialpha)
 
     def cal_bethe(self, margin):
-        clip_potential = np.clip(self.potential, 1e-12, np.inf)
+        clip_potential = np.clip(self.potential, 1e-12, None)
         return np.sum(margin * np.log(margin / clip_potential))
 
     def marginal(self):
