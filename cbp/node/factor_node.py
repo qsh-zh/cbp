@@ -127,9 +127,7 @@ class FactorNode(BaseNode):
         message_val = np.array([message.val for message in self.latest_message])
         prod_messages = np.prod(message_val, axis=0)
         product_out = np.multiply(self.potential, prod_messages)
-        unormalized = np.power(
-            product_out / np.sum(product_out),
-            1.0 / self.node_coef)
+        unormalized = np.power(product_out, 1.0 / self.node_coef)
         return unormalized / np.sum(unormalized)
 
     def cal_inner_parentheses(self, recipient_node):
