@@ -1,0 +1,2 @@
+[test]
+command=exec zsh && qinsheng && pytest test --cov cbp --cov-report=xml

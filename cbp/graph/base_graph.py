@@ -125,7 +125,8 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def first_belief_propagation(self):
         for node in self.nodes:
             for recipient_name in node.connections:
-                if recipient_name not in self.node_recorder:
+                recipient = self.node_recorder[recipient_name]
+                if recipient.name not in node.message_inbox:
                     val = node.make_init_message(recipient_name)
                     message = Message(node, val)
                     self.node_recorder[recipient_name].store_message(message)
@@ -180,7 +181,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
 
             copy_denominator = reduction_ndarray(
                 normalized_denominator, recorder['index'])
-            copy_denominator = np.clip(copy_denominator, 1e-12, 1e12)
+            copy_denominator = np.clip(copy_denominator, 1e-12, None)
             recorder['u'] = recorder['u'] * recorder['mu'] / copy_denominator
 
         varnodes = list(self.varnode_recorder.values())

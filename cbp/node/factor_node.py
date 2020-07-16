@@ -111,9 +111,8 @@ class FactorNode(BaseNode):
         with np.errstate(divide='raise'):
             hat_c_ialpha = self.hat_c_ialpha[recipient_node.name]
             log_media = 1.0 / hat_c_ialpha * \
-                np.log(np.clip(product_out, 1e-12, 10))
-            product_out_power = np.exp(
-                log_media - np.max(np.nan_to_num(log_media)))
+                np.log(np.clip(product_out, 1e-12, None))
+            product_out_power = np.exp(log_media)
             return np.power(
                 self.summation(
                     product_out_power,
@@ -121,17 +120,15 @@ class FactorNode(BaseNode):
                 hat_c_ialpha)
 
     def cal_bethe(self, margin):
-        clip_potential = np.clip(self.potential, 1e-12, np.inf)
+        clip_potential = np.clip(self.potential, 1e-12, None)
         return np.sum(margin * np.log(margin / clip_potential))
 
     def marginal(self):
         message_val = np.array([message.val for message in self.latest_message])
         prod_messages = np.prod(message_val, axis=0)
         product_out = np.multiply(self.potential, prod_messages)
-        unormalized = np.power(
-            product_out / np.sum(product_out),
-            1.0 / self.node_coef)
-        return unormalized
+        unormalized = np.power(product_out, 1.0 / self.node_coef)
+        return unormalized / np.sum(unormalized)
 
     def cal_inner_parentheses(self, recipient_node):
         latest_message = self.latest_message
@@ -141,8 +138,6 @@ class FactorNode(BaseNode):
         message_val = np.array([message.val for message in filtered_message])
 
         prod_messages = np.prod(message_val, axis=0)
-
-        prod_messages /= np.mean(prod_messages)
 
         product_out = np.multiply(self.potential, prod_messages)
         self.last_innerparenthese_msg[recipient_node.name] = product_out

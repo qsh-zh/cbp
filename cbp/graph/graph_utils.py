@@ -36,10 +36,6 @@ def itsbp_inner_loop(loop_link, is_silent):
     for sender, receiver in zip(loop_link[0:-1], loop_link[1:]):
         sender.send_message(receiver, is_silent)
 
-    loop_link.reverse()
-    for sender, receiver in zip(loop_link[0:-1], loop_link[1:]):
-        sender.send_message(receiver, is_silent)
-
 
 def cal_marginal_from_tensor(prob_tensor, varnode_list):
     rtn_marginal = []

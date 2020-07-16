@@ -24,7 +24,7 @@ class VarNode(BaseNode):
             assert constrained_marginal.shape[0] == rv_dim
             assert abs(np.sum(constrained_marginal) - 1) < 1e-6
             self.isconstrained = True
-            constrained_marginal = np.clip(constrained_marginal, 1e-12, np.inf)
+            constrained_marginal = np.clip(constrained_marginal, 1e-12, None)
         self.constrained_marginal = constrained_marginal
 
     def _check_potential(self, potential):
@@ -69,13 +69,12 @@ class VarNode(BaseNode):
             else:
                 potential_part = 1.0 / self.hat_c_i * np.log(self.potential)
                 message_part = 1.0 / self.hat_c_i * \
-                    np.log(np.clip(np.prod(vals, axis=0), 1e-12, 1e12))
+                    np.log(np.clip(np.prod(vals, axis=0), 1e-12, None))
                 log_numerator = potential_part + message_part
-            clip_base = np.clip(vals[recipient_index_in_var], 1e-12, 1e12)
+            clip_base = np.clip(vals[recipient_index_in_var], 1e-12, None)
             log_denominator = 1.0 / hat_c_ialpha * np.log(clip_base)
 
             log_base = c_alpha * (log_numerator - log_denominator)
-            # log_base = log_base - np.max(np.nan_to_num(log_base))
             return np.exp(log_base)
 
     def make_message_bp(self, recipient_node):
@@ -99,10 +98,10 @@ class VarNode(BaseNode):
         return self.make_message_bp(recipient_node)
 
     def cal_bethe(self, margin):
-        clip_margin = np.clip(margin, 1e-12, np.inf)
+        clip_margin = np.clip(margin, 1e-12, None)
         log_margin = np.log(clip_margin)
         entropy_term = -(self.node_degree - 1) * np.sum(margin * log_margin)
-        clip_potential = np.clip(self.potential, 1e-12, np.inf)
+        clip_potential = np.clip(self.potential, 1e-12, None)
         potential_term = -np.sum(margin * np.log(clip_potential))
         return potential_term + entropy_term
 
