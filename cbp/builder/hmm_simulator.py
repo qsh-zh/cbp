@@ -307,7 +307,6 @@ class HMMSimulator:  # pylint: disable=too-many-public-methods
         sim_path = f"{self.path}/sim.pkl"
         with open(sim_path, 'wb') as handle:
             pickle.dump(self, handle)
-        print(f"saving to {self.name}")
 
     @classmethod
     def load(cls, sim_name: str):

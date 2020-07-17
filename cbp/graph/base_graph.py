@@ -341,7 +341,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
     def plot(self, png_name='file.png'):
         """plot the graph through graphviz
 
-            * red: constrained variable
+            * red: constrained variable node
             * blue: free variable node
             * green: factor
 
