@@ -13,7 +13,7 @@ More details on :cite:`SigHaaZha20` work
    :maxdepth: 1
    :caption: Quick start guide
 
-   tutorial/start
+   tutorial/example.ipynb
 
 .. toctree::
    :maxdepth: 1

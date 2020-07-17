@@ -55,6 +55,7 @@ setup(
         'dev': [
             'Sphinx',
             'sphinx_rtd_theme',
+            'nbsphinx',
             'sphinxcontrib-bibtex',
             'pylint',
             'pytest',
