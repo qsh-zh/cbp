@@ -1,5 +1,3 @@
-from functools import partial
-
 from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop)
 from cbp.configs.base_config import baseconfig
