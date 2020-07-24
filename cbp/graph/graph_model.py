@@ -14,7 +14,8 @@ class GraphModel(BaseGraph):
                          epsilon=epsilon, coef_policy=coef_policy)
         self.itsbp_outer_cnt = 0
 
-    def init_cnp_coef(self):
+    def bake(self):
+        super().bake()
         for node in self.nodes:
             node.cal_cnp_coef()
 
@@ -31,7 +32,6 @@ class GraphModel(BaseGraph):
     def norm_product_bp(self, max_iter=5000000, tolerance=1e-5, error_fun=None):
         if error_fun is None:
             error_fun = diff_max_marginals
-        self.init_cnp_coef()
         self.first_belief_propagation()
         return self.engine_loop(
             max_iter=max_iter,
@@ -68,7 +68,6 @@ class GraphModel(BaseGraph):
         :return: [description]
         :rtype: [type]
         """
-        self.init_cnp_coef()
         self.first_belief_propagation()
         return self.engine_loop(self.itsbp_outer_loop,
                                 tolerance=1e-4,

@@ -190,13 +190,13 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         for node, marginal in zip(varnodes, marginal_list):
             node.sinkhorn = marginal
 
-    def check_sinkhorn(self):
+    def __check_sinkhorn(self):
         if len(self.constrained_names) == 0:
             raise RuntimeError(
                 "There is no constrained nodes, use brutal force")
 
     def sinkhorn(self, max_iter=5000000, tolerance=1e-5):
-        self.check_sinkhorn()
+        self.__check_sinkhorn()
         tilde_c = self.pmf()
         self.__init_sinkhorn_node()
 
@@ -214,13 +214,13 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         for node in self.nodes:
             if len(node.connections) == 1:
                 root = node
-        self.auto_node_coef(root)
+        self.__cal_node_coef(root)
 
-    def auto_node_coef(self, node):
+    def __cal_node_coef(self, node):
         node.is_traversed = True
         for item in node.connections:
             if not self.node_recorder[item].is_traversed:
-                self.auto_node_coef(self.node_recorder[item])
+                self.__cal_node_coef(self.node_recorder[item])
 
         node.auto_coef(self.node_recorder, self.coef_policy)
         node.is_traversed = False
@@ -378,7 +378,6 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         """
         assert len(self.constrained_names) == 0
         self.bake()
-        self.init_cnp_coef()
         self.first_belief_propagation()
         for node in self.nodes:
             node.is_send_forward = False
