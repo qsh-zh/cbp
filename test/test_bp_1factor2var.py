@@ -11,6 +11,15 @@ class TestGraph(unittest.TestCase):
         self.graph = two_node_tree()
         self.graph.coef_policy = bp_policy
 
+    def test_tree_bp(self):
+        self.graph.tree_bp()
+        node_equal = np.isclose(np.array([0.2, 0.8]),
+                                self.graph.get_node("VarNode_000").marginal())
+        self.assertTrue(all(node_equal))
+        node_equal = np.isclose(np.array([0.24, 0.76]),
+                                self.graph.get_node("VarNode_001").marginal())
+        self.assertTrue(all(node_equal))
+
     def test_marginal_brutal_force(self):
         self.graph.exact_marginal()
         node_equal = np.isclose(np.array([0.2, 0.8]),

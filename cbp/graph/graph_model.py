@@ -97,31 +97,3 @@ class GraphModel(BaseGraph):
 
             if run_constrained or (not target_var.isconstrained):
                 target_var.sendout_message(self.silent)
-
-    def two_pass(self):
-        # TODO: remove!
-        self.init_cnp_coef()
-        self.first_belief_propagation()
-        for node in self.nodes:
-            node.marked = False
-
-        for node in self.nodes:
-            if len(node.connections) == 1:
-                root_node = node
-
-        self.send_from(root_node)
-        self.send_out(root_node)
-
-    def send_from(self, node):
-        node.marked = True
-        for cur_node in node.connected_nodes.values():
-            if not cur_node.marked:
-                self.send_from(cur_node)
-                cur_node.send_message(node)
-
-    def send_out(self, node):
-        node.marked = False
-        for cur_node in node.connected_nodes.values():
-            if cur_node.marked:
-                node.send_message(cur_node)
-                self.send_out(cur_node)

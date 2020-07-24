@@ -366,3 +366,43 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
             graph.draw(png_name)
         else:
             raise ValueError("must have pygraphviz installed for visualization")
+
+    def tree_bp(self):
+        """run classical belief propagation on a tree graph, only need forward
+        and backward
+
+            * add attr: is_send_forward: begin send forward false, after forward
+             before backward true, after backward false
+        :raises RuntimeError: Only works for the tree graph, loopy graph does
+        not work, root node not decided
+        """
+        assert len(self.constrained_names) == 0
+        self.bake()
+        self.init_cnp_coef()
+        self.first_belief_propagation()
+        for node in self.nodes:
+            node.is_send_forward = False
+
+        tree_root = None
+        for node in self.nodes:
+            if len(node.connections) == 1:
+                tree_root = node
+        if tree_root is None:
+            raise RuntimeError("graph contains circle")
+
+        self._send_forward(tree_root)
+        self._send_backward(tree_root)
+
+    def _send_forward(self, node):
+        node.is_send_forward = True
+        for cur_node in node.connected_nodes.values():
+            if not cur_node.is_send_forward:
+                self._send_forward(cur_node)
+                cur_node.send_message(node)
+
+    def _send_backward(self, node):
+        node.is_send_forward = False
+        for cur_node in node.connected_nodes.values():
+            if cur_node.is_send_forward:
+                node.send_message(cur_node)
+                self._send_backward(cur_node)
