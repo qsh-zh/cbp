@@ -24,7 +24,7 @@ class FactorNode(BaseNode):
         num_connectednode = []
         for item in self.connections:
             self.i_alpha[item] = None
-            num_connectednode.append(int(item[8:]))
+            num_connectednode.append(int(item[-3:]))
 
         if any(i > j for i, j in zip(num_connectednode, num_connectednode[1:])):
             raise RuntimeError('Set the connection of factor in order')
@@ -162,3 +162,9 @@ class FactorNode(BaseNode):
         assert potential_dim[node_index] == node.rv_dim
         return potential.sum(
             tuple(j for j in range(potential.ndim) if j != node_index))
+
+    def __eq__(self, value):
+        if isinstance(value, FactorNode):
+            return super().__eq__(value)
+
+        return False

@@ -164,3 +164,14 @@ class BaseNode(ABC):
 
         raise RuntimeError(
             f"{node_name} do not appear in {self.name} message")
+
+    def __eq__(self, value):
+        flag = []
+        flag.append((np.isclose(self.potential, value.potential)).all())
+        flag.append(set(self.connections) == set(value.connections))
+        flag.append(self.node_degree == value.node_degree)
+        flag.append((np.isclose(self.node_coef, value.node_coef)).all())
+        if np.sum(flag) == len(flag):
+            return True
+
+        return False

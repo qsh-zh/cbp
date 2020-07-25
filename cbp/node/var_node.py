@@ -116,3 +116,14 @@ class VarNode(BaseNode):
             return belief / np.sum(belief)
 
         return np.ones(self.rv_dim) / self.rv_dim
+
+    def __eq__(self, value):
+        if isinstance(value, type(self)):
+            flag = []
+            flag.append(self.isconstrained == value.isconstrained)
+            flag.append(np.array_equal(self.constrained_marginal,
+                                       value.constrained_marginal))
+            if np.sum(flag) == len(flag):
+                return True and super().__eq__(value)
+
+        return False
