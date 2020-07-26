@@ -1,6 +1,7 @@
 from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop)
 from cbp.configs.base_config import baseconfig
+from cbp.node import VarNode
 
 from .base_graph import BaseGraph
 from .coef_policy import bp_policy
@@ -13,6 +14,17 @@ class GraphModel(BaseGraph):
         super().__init__(config=config, silent=silent,
                          epsilon=epsilon, coef_policy=coef_policy)
         self.itsbp_outer_cnt = 0
+
+    def add_varnode(self, node):
+        """ add check node type and call parent checker
+
+        :param node: one VarNode
+        :type node: VarNode
+        :return: name of varnode
+        :rtype: str
+        """
+        assert isinstance(node, VarNode)
+        return super().add_varnode(node)
 
     def bake(self):
         super().bake()

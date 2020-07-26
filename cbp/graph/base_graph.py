@@ -24,7 +24,6 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.leaf_nodes = []
         self.factornode_recorder = {}
         self.node_recorder = {}
-        self.epsilon = epsilon
         self.coef_policy = coef_policy
         self.cnt_varnode = 0
         self.cnt_factornode = 0
@@ -37,12 +36,11 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         """add one `~cbp.node.VarNode` to this graph, idx follow the increasing
         order
 
-        :param node: one VarNode
-        :type node: VarNode
-        :return: name of varnode
+        :param node: one var node
+        :type node: var node
+        :return: name of var node
         :rtype: str
         """
-        assert isinstance(node, VarNode)
         varnode_name = f"VarNode_{self.cnt_varnode:03d}"
         node.format_name(varnode_name)
         self.varnode_recorder[varnode_name] = node
@@ -57,16 +55,15 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         """add one factor node to the graph
         Do the following tasks
 
+        *set factornode name attr
         * add node to the recorders
         * set connections
         * set parent relation
 
         :param factornode: one factor node
-        :type factornode: FactorNode
         :return: name of factor node
         :rtype: str
         """
-        factornode.check_potential(self.varnode_recorder)
         factornode_name = f"FactorNode_{self.cnt_factornode:03d}"
         factornode.format_name(factornode_name)
         self.factornode_recorder[factornode_name] = factornode
@@ -79,12 +76,12 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         return factornode_name
 
     def __register_connection(self, factornode):
-        for varnode_name in factornode.get_connections():
+        for varnode_name in factornode.connections:
             varnode = self.varnode_recorder[varnode_name]
             varnode.register_connection(factornode.name)
 
     def __set_parent(self, factornode):
-        connections = factornode.get_connections()
+        connections = factornode.connections
         factornode.parent = self.varnode_recorder[connections[0]]
         for varnode_name in connections[1:]:
             varnode = self.varnode_recorder[varnode_name]
@@ -104,7 +101,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         joint_acc = np.ones(var_dim)
         for factor in self.factornode_recorder.values():
             which_dims = [varnode_names.index(v)
-                          for v in factor.get_connections()]
+                          for v in factor.connections]
             factor_acc = np.ones(var_dim)
 
             factor_acc = nd_multiexpand(factor.potential, var_dim, which_dims)
@@ -217,10 +214,15 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.__cal_node_coef(root)
 
     def __cal_node_coef(self, node):
+        for _node in self.nodes:
+            setattr(_node, 'is_traversed', False)
+        self.__traverse_node_coef(node)
+
+    def __traverse_node_coef(self, node):
         node.is_traversed = True
         for item in node.connections:
             if not self.node_recorder[item].is_traversed:
-                self.__cal_node_coef(self.node_recorder[item])
+                self.__traverse_node_coef(self.node_recorder[item])
 
         node.auto_coef(self.node_recorder, self.coef_policy)
         node.is_traversed = False
@@ -231,7 +233,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         # in Norm-Product, run factor message first
         self.nodes = factors + variables  # pylint: disable=attribute-defined-outside-init
         self.leaf_nodes = [
-            node for node in self.nodes if len(node.get_connections()) == 1]
+            node for node in self.nodes if len(node.connections) == 1]
 
     def get_node(self, name_str):
         if name_str not in self.node_recorder:
@@ -268,14 +270,14 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         target_node = self.node_recorder[name_str]
         if isinstance(target_node, VarNode):
             warnings.warn(f"Delete {name_str}, may have a suspend factor node")
-        for connected_name in target_node.get_connections():
+        for connected_name in target_node.connections:
             connected_node = self.node_recorder[connected_name]
             if connected_node.parent is target_node:
                 connected_node.parent = None
-            connected_node.get_connections().remove(name_str)
+            connected_node.connections.remove(name_str)
 
             # clear map
-            if len(connected_node.get_connections()) == 0:
+            if len(connected_node.connections) == 0:
                 self.__delete_node_recorder(connected_node)
 
         self.__delete_node_recorder(target_node)
@@ -359,7 +361,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
 
             for name, factornode in self.factornode_recorder.items():
                 graph.add_node(name, color='green')
-                for varnode_name in factornode.get_connections():
+                for varnode_name in factornode.connections:
                     graph.add_edge(name, varnode_name)
 
             graph.layout(prog='neato')
@@ -380,7 +382,7 @@ class BaseGraph():  # pylint: disable=too-many-instance-attributes
         self.bake()
         self.first_belief_propagation()
         for node in self.nodes:
-            node.is_send_forward = False
+            setattr(node, 'is_send_forward', False)
 
         tree_root = None
         for node in self.nodes:

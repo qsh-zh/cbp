@@ -1,12 +1,11 @@
 import numpy as np
 from cbp.utils.np_utils import nd_expand
 
-from .base_node import BaseNode
+from .discrete_node import DiscreteNode
 
 
-class FactorNode(BaseNode):
-    """Factor Node in factor graph
-
+class FactorNode(DiscreteNode):
+    """Factor Node in factor graph.
       Add new attr:
         * ``isconstrained`` Fixed marginal or not
         * ``hat_c_ialpha`` See Norm-Product paper
@@ -14,6 +13,19 @@ class FactorNode(BaseNode):
     """
 
     def __init__(self, connections, potential, coef=1):
+        """except calling `~cbp.node.BaseNode` do init work
+        * init last_innerparenthese_msg for cnp
+        * check the connections should obey increasing order, the reason is
+        defualt first dimension of potential coresponding to parent node
+
+        :param connections: list of str, names connected variable nodes
+        :type connections: list
+        :param potential: 2d potential matrixx
+        :type potential: ndarray
+        :param coef: [description], defaults to 1
+        :type coef: int, optional
+        :raises RuntimeError: [description]
+        """
         super().__init__(coef, potential)
         self.connections = connections
         self.last_innerparenthese_msg = {}
@@ -24,6 +36,8 @@ class FactorNode(BaseNode):
         num_connectednode = []
         for item in self.connections:
             self.i_alpha[item] = None
+            self.last_innerparenthese_msg[item] = np.ones(
+                self.potential.shape)
             num_connectednode.append(int(item[-3:]))
 
         if any(i > j for i, j in zip(num_connectednode, num_connectednode[1:])):
@@ -34,16 +48,21 @@ class FactorNode(BaseNode):
         self.check_potential(node_map)
 
     def check_potential(self, node_map):
+        """ * check the discrete potential matrix dimension
+
+        :param node_map: a map contains the var nodes
+        :type node_map: map
+        """
         for i, varnode_name in enumerate(self.connections):
             varnode = node_map[varnode_name]
             assert self.potential.shape[i] == varnode.rv_dim, \
                 f"Dimention mismatch! At {i:02d} axis in Factor:{self.name} \
                     rv_dim:{varnode.rv_dim:02d}, \
                     potential: {self.potential.shape[i]}"
-            self.last_innerparenthese_msg[varnode_name] = np.ones(
-                self.potential.shape)
 
     def _check_potential(self, potential):
+        """normalize the potential
+        """
         return potential / np.sum(potential)
 
     def auto_coef(self, node_map, assign_policy=None):

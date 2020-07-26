@@ -1,10 +1,10 @@
 import numpy as np
 from cbp.utils.np_utils import nd_expand
 
-from .base_node import BaseNode
+from .discrete_node import DiscreteNode
 
 
-class VarNode(BaseNode):
+class VarNode(DiscreteNode):
     """Variable Node in Factor graph
 
         Add new attr:
@@ -28,6 +28,8 @@ class VarNode(BaseNode):
         self.constrained_marginal = constrained_marginal
 
     def _check_potential(self, potential):
+        """deal None case
+        """
         if potential is None:
             return np.ones([self.rv_dim])
         assert potential.shape[0] == self.rv_dim
