@@ -11,4 +11,7 @@ class GOVarNode(BaseNode):
 
     def discrete(self):
         num_sample = len(self.bins)
-        return VarNode(num_sample, np.ones(num_sample) / num_sample)
+        return VarNode(
+            num_sample,
+            constrained_marginal=np.ones(num_sample) /
+            num_sample)

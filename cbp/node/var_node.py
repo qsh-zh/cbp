@@ -129,3 +129,9 @@ class VarNode(DiscreteNode):
                 return True and super().__eq__(value)
 
         return False
+
+    def plot(self, graph):
+        if self.isconstrained:
+            graph.add_node(self.name, color='red', style='filled')
+        else:
+            super().plot(graph)

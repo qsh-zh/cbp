@@ -15,9 +15,16 @@ class GOFactorNode(BaseNode):
         super().__init__()
         self.connections = connections
 
-    def discrete(self, varnode):
+    def discrete_var(self, varnode):
         assert isinstance(varnode, GOVarNode)
         potenital = []
         for loc, scale in zip(self.loc, self.scale):
             potenital.append(norm.pdf(varnode.bins, loc=loc, scale=scale))
         return FactorNode(self.connections, np.array(potenital))
+
+    def discrete(self):
+        for node in self.connected_nodes.values():
+            if isinstance(node, GOVarNode):
+                return self.discrete_var(node)
+
+        raise RuntimeError("go graph has no GOVarNode")

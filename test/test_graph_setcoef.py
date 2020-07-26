@@ -11,7 +11,7 @@ class TestSetCNPCoef(unittest.TestCase):
 
     def test_avg_policy(self):
         self.graph.coef_policy = avg_policy
-        self.graph.init_node_recorder()
+        self.graph.init_node_list()
         self.graph.bake()
         for node in self.graph.nodes:
             node.cal_cnp_coef()
@@ -29,7 +29,7 @@ class TestSetCNPCoef(unittest.TestCase):
 
     def test_bp_policy(self):
         self.graph.coef_policy = bp_policy
-        self.graph.init_node_recorder()
+        self.graph.init_node_list()
         self.graph.bake()
         for node in self.graph.nodes:
             node.cal_cnp_coef()

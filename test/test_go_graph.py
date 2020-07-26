@@ -35,13 +35,14 @@ class TestGOGraph(unittest.TestCase):
             rv_dim=num_obser,
             potential=np.ones(num_obser),
             constrained_marginal=np.ones(num_obser) / num_obser)
+        target_var.name = 'VarNode_001'
         target_var.register_connection('FactorNode_000')
         self.assertEqual(target_var, discrete_graph.get_node('VarNode_001'))
 
         target_potential = []
         for i in range(dim):
-            target_potential.append(norm(observation,
-                                         loc=mu[i], scale=sigma[i]))
+            target_potential.append(norm.pdf(observation,
+                                             loc=mu[i], scale=sigma[i]))
         target_factor = FactorNode(
             connected_names,
             np.array(target_potential))

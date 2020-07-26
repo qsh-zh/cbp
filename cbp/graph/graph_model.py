@@ -3,17 +3,18 @@ from cbp.utils import (compare_marginals, diff_max_marginals,
 from cbp.configs.base_config import baseconfig
 from cbp.node import VarNode
 
-from .base_graph import BaseGraph
 from .coef_policy import bp_policy
 from .graph_utils import itsbp_inner_loop, find_link
+from .discrete_graph import DiscreteGraph
 
 
-class GraphModel(BaseGraph):
-    def __init__(self, silent=True, epsilon=1,
+class GraphModel(DiscreteGraph):
+    def __init__(self, silent=True,
                  coef_policy=bp_policy, config=baseconfig):
-        super().__init__(config=config, silent=silent,
-                         epsilon=epsilon, coef_policy=coef_policy)
+        super().__init__(coef_policy=coef_policy)
+        self.cfg = config
         self.itsbp_outer_cnt = 0
+        self.silent = silent
 
     def add_varnode(self, node):
         """ add check node type and call parent checker

@@ -55,6 +55,9 @@ class BaseNode(ABC):
     def search_node_index(self, node_name):
         return self.connections.index(node_name)
 
+    def plot(self, graph):
+        graph.add_node(self.name, color='blue', style='bold')
+
     def __eq__(self, value):
         flag = []
         flag.append(set(self.connections) == set(value.connections))

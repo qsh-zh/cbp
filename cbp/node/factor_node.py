@@ -187,3 +187,6 @@ class FactorNode(DiscreteNode):
             return super().__eq__(value)
 
         return False
+
+    def plot(self, graph):
+        graph.add_node(self.name, color='green')
