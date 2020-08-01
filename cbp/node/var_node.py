@@ -31,8 +31,8 @@ class VarNode(BaseNode):
         if potential is None:
             return np.ones([self.rv_dim])
         assert potential.shape[0] == self.rv_dim
-        potential = np.clip(potential, 1e-12, None)
-        return potential / np.sum(potential)
+        final_potential = np.clip(potential, 1e-12, None)
+        return final_potential / np.sum(final_potential)
 
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)

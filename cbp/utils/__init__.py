@@ -1,6 +1,6 @@
-from .message import Message
 from . import np_utils
-from .event_utils import engine_loop, compare_marginals, diff_max_marginals
+from .event_utils import compare_marginals, diff_max_marginals, engine_loop
+from .message import Message
 
 __all__ = [
     "Message",

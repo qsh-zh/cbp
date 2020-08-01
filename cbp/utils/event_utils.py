@@ -11,6 +11,23 @@ def engine_loop(  # pylint: disable=too-many-arguments
         meassure_fun=None,
         isoutput=False,
         silent=False):
+    """work engine for loop
+
+    :param engine_fun: work function
+    :param max_iter: max iteration, defaults to 5000000
+    :type max_iter: int, optional
+    :param tolerance: less than tolerance, stop, defaults to 1e-2
+    :type tolerance: float, optional
+    :param error_fun: output the metrics for this iteration, defaults to None
+    :type error_fun: func, optional
+    :param meassure_fun: relative distance between continuous two metrics, defaults to None
+    :type meassure_fun: func, optional
+    :param isoutput: output the distance, defaults to False
+    :type isoutput: bool, optional
+    :param silent: output details, defaults to False
+    :type silent: bool, optional
+    :return: list of relative distance, num of running iteration, timers
+    """
     check_step = 1
     epsilons = [np.inf] * check_step
     start = time.time()
