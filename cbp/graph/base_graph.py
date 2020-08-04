@@ -7,6 +7,13 @@ except BaseException:
 
 
 class BaseGraph():
+    """
+    base graph type, responsible for basic graph manipulation.
+        * register var node and factor node
+        * delete node
+        * access node
+    """
+
     def __init__(self):
         self.varnode_recorder = {}
         self.factornode_recorder = {}
@@ -127,13 +134,11 @@ class BaseGraph():
     def plot(self, png_name='file.png'):
         """plot the graph through graphviz
 
-            * red: constrained variable node
-            * blue: free variable node
-            * green: factor
+            * delegate node plot to different node type
 
         :param png_name: name of figure, defaults to 'file.png'
         :type png_name: str, optional
-        :raises ValueError: [description]
+        :raises ValueError: pygraphviz not installed
         """
         if pygraphviz is not None:
             graph = pygraphviz.AGraph(directed=False)

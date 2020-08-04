@@ -27,4 +27,4 @@ class GOFactorNode(BaseNode):
             if isinstance(node, GOVarNode):
                 return self.discrete_var(node)
 
-        raise RuntimeError("go graph has no GOVarNode")
+        raise RuntimeError("go factor has no GOVarNode")
