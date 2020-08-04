@@ -30,9 +30,10 @@ class FactorNode(DiscreteNode):
         self.connections = connections
         self.last_innerparenthese_msg = {}
         self.hat_c_ialpha = {}
-
         self.i_alpha = {}
+        self.__init_cnp()
 
+    def __init_cnp(self):
         num_connectednode = []
         for item in self.connections:
             self.i_alpha[item] = None
@@ -68,17 +69,21 @@ class FactorNode(DiscreteNode):
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)
 
+        sum_i_alpha, unset_edge = self.__sum_neighbor_coef()
+        if unset_edge:
+            new_i_alpha = 1 - self.node_coef - sum_i_alpha
+            self.set_i_alpha(unset_edge, new_i_alpha)
+
+    def __sum_neighbor_coef(self):
         sum_i_alpha = 0
-        unset_edge = None
+        uninit_neighbor = None
         for connected_var in self.connections:
             i_alpha = self.get_i_alpha(connected_var)
             if i_alpha is not None:
                 sum_i_alpha += i_alpha
             else:
-                unset_edge = connected_var
-        if unset_edge:
-            new_i_alpha = 1 - self.node_coef - sum_i_alpha
-            self.set_i_alpha(unset_edge, new_i_alpha)
+                uninit_neighbor = connected_var
+        return sum_i_alpha, uninit_neighbor
 
     def get_i_alpha(self, connection_name):
         return self.i_alpha[connection_name]

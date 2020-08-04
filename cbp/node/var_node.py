@@ -38,18 +38,22 @@ class VarNode(DiscreteNode):
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)
 
-        sum_i_alpha = 0
-        unset_edge = None
-        for item in self.connected_nodes.values():
-            i_alpha = item.get_i_alpha(self.name)
-            if i_alpha is not None:
-                sum_i_alpha += i_alpha
-            else:
-                unset_edge = item.name
+        sum_i_alpha, unset_edge = self.__sum_neighbor_coef()
         if unset_edge:
             new_i_alpha = self.node_coef - \
                 (1 - len(self.connections)) - sum_i_alpha
             self.connected_nodes[unset_edge].set_i_alpha(self.name, new_i_alpha)
+
+    def __sum_neighbor_coef(self):
+        sum_i_alpha = 0
+        uninit_neighbor = None
+        for node in self.connected_nodes.values():
+            i_alpha = node.get_i_alpha(self.name)
+            if i_alpha is not None:
+                sum_i_alpha += i_alpha
+            else:
+                uninit_neighbor = node.name
+        return sum_i_alpha, uninit_neighbor
 
     def cal_cnp_coef(self):
         self.coef_ready = True
