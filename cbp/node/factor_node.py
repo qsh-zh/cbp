@@ -190,3 +190,5 @@ class FactorNode(DiscreteNode):
 
     def plot(self, graph):
         graph.add_node(self.name, color='green')
+        for var_name in self.connections:
+            graph.add_edge(self.name, var_name)

@@ -13,7 +13,7 @@ class VarNode(DiscreteNode):
     """
 
     def __init__(self, rv_dim, potential=None,
-                 constrained_marginal=None, node_coef=1):
+                 constrained_marginal=None, node_coef=0):
         self.rv_dim = rv_dim
         self.hat_c_i = None
         super().__init__(node_coef, potential)
@@ -126,7 +126,7 @@ class VarNode(DiscreteNode):
             flag.append(np.array_equal(self.constrained_marginal,
                                        value.constrained_marginal))
             if np.sum(flag) == len(flag):
-                return True and super().__eq__(value)
+                return super().__eq__(value)
 
         return False
 

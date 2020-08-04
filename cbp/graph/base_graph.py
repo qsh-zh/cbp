@@ -17,6 +17,7 @@ class BaseGraph():
     def __init__(self):
         self.varnode_recorder = {}
         self.factornode_recorder = {}
+
         self.leaf_nodes = []
         self.nodes = []
         self.node_recorder = {}
@@ -24,7 +25,7 @@ class BaseGraph():
         self.cnt_factornode = 0
 
     def add_varnode(self, node):
-        """add one `~cbp.node.VarNode` to this graph, idx follow the increasing
+        """add one variable node type to this graph, idx follow the increasing
         order
 
         :param node: one var node
@@ -35,7 +36,6 @@ class BaseGraph():
         varnode_name = f"VarNode_{self.cnt_varnode:03d}"
         node.format_name(varnode_name)
         self.varnode_recorder[varnode_name] = node
-        self.node_recorder[varnode_name] = node
 
         self.cnt_varnode += 1
         return varnode_name
@@ -45,7 +45,7 @@ class BaseGraph():
         Do the following tasks
 
         *set factornode name attr
-        * add node to the recorders
+        * add node to recorder
         * set connections
         * set parent relation
 
@@ -56,7 +56,6 @@ class BaseGraph():
         factornode_name = f"FactorNode_{self.cnt_factornode:03d}"
         factornode.format_name(factornode_name)
         self.factornode_recorder[factornode_name] = factornode
-        self.node_recorder[factornode_name] = factornode
 
         self.__register_connection(factornode)
         self.__set_parent(factornode)
@@ -86,6 +85,9 @@ class BaseGraph():
         self.nodes = factors + variables
         self.leaf_nodes = [
             node for node in self.nodes if len(node.connections) == 1]
+        self.node_recorder = {
+            **self.factornode_recorder,
+            **self.varnode_recorder}
 
     def get_root(self):
         if len(self.leaf_nodes) == 0:
@@ -104,32 +106,33 @@ class BaseGraph():
         * delete from the various recorders
         * call init_node_list
 
-        :param name_str: [description]
-        :type name_str: [type]
-        :raises RuntimeError: [description]
+        :param name_str: name of delete node
+        :type name_str: str
+        :raises RuntimeError: node name not in this graph
         """
         if name_str not in self.node_recorder:
             raise RuntimeError(f"{name_str} is illegal, not in this graph")
         target_node = self.node_recorder[name_str]
         if 'var' in name_str.lower():
             warnings.warn(f"Delete {name_str}, may have a suspend factor node")
+        self._delete_node_connection(target_node)
+        self._delete_node_recorder(target_node)
+
+    def _delete_node_connection(self, target_node):
         for connected_name in target_node.connections:
             connected_node = self.node_recorder[connected_name]
             if connected_node.parent is target_node:
                 connected_node.parent = None
-            connected_node.connections.remove(name_str)
+            connected_node.connections.remove(target_node.name)
 
             # clear map
             if len(connected_node.connections) == 0:
                 self._delete_node_recorder(connected_node)
 
-        self._delete_node_recorder(target_node)
-
     def _delete_node_recorder(self, node):
         target_map = self.varnode_recorder if 'var' in node.name.lower(
         ) else self.factornode_recorder
         del target_map[node.name]
-        del self.node_recorder[node.name]
 
     def plot(self, png_name='file.png'):
         """plot the graph through graphviz
@@ -142,7 +145,10 @@ class BaseGraph():
         """
         if pygraphviz is not None:
             graph = pygraphviz.AGraph(directed=False)
-            for node in self.nodes:
+            for node in self.varnode_recorder.values():
+                node.plot(graph)
+
+            for node in self.factornode_recorder.values():
                 node.plot(graph)
 
             graph.layout(prog='neato')

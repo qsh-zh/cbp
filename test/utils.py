@@ -20,6 +20,7 @@ def two_node_tree():
     ])
     factornode = FactorNode(connect_var, factor_potential)
     graph.add_factornode(factornode)
+    graph.bake()
 
     return graph
 
@@ -65,7 +66,6 @@ def six_node_graph():
         factornode = FactorNode(factorname, np.exp(potential))
         graph.add_factornode(factornode)
     graph.plot(f"data/six_node_graph.png")
-
     return graph
 
 

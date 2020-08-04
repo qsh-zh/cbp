@@ -123,6 +123,7 @@ class DiscreteGraph(BaseGraph):
         return joint_prob
 
     def exact_marginal(self):
+        self.bake()
         varnodes = list(self.varnode_recorder.values())
         prob_tensor = self.__pmf()
 

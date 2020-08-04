@@ -25,6 +25,7 @@ class GOGraph(BaseGraph):
         self.discrete_graph = GraphModel()
         self._discrete_var()
         self._discrete_factor()
+        self.discrete_graph.bake()
 
     def _discrete_var(self):
         for node in self.varnode_recorder.values():

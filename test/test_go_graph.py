@@ -18,7 +18,7 @@ class TestGOGraph(unittest.TestCase):
         mu = self.rng.normal(size=dim)
         sigma = self.rng.uniform(size=dim)
 
-        var = VarNode(dim)
+        var = VarNode(dim, node_coef=0)
         go_var = GOVarNode(observation)
         factor = GOFactorNode(connected_names, mu, sigma)
 
@@ -34,7 +34,7 @@ class TestGOGraph(unittest.TestCase):
         target_var = VarNode(
             rv_dim=num_obser,
             potential=np.ones(num_obser),
-            constrained_marginal=np.ones(num_obser) / num_obser)
+            constrained_marginal=np.ones(num_obser) / num_obser, node_coef=0)
         target_var.name = 'VarNode_001'
         target_var.register_connection('FactorNode_000')
         self.assertEqual(target_var, discrete_graph.get_node('VarNode_001'))
