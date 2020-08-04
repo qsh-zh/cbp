@@ -11,7 +11,7 @@ from .potential_utils import diagonal_potential, diagonal_potential_conv
 
 class BaseBuilder(ABC):
     def __init__(self, dim, policy, rand_seed=1):
-        self.graph = GraphModel(True, coef_policy=policy)
+        self.graph = GraphModel(coef_policy=policy)
         self.node_dim = dim
         self.rng = RandomState(rand_seed)
 

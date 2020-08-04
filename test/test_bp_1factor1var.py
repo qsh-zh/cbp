@@ -7,7 +7,7 @@ from cbp.graph import GraphModel
 
 class TestGraph(unittest.TestCase):
     def setUp(self):
-        self.graph = GraphModel(silent=False)
+        self.graph = GraphModel()
 
         # init varnode
         self.varnode_1 = VarNode(2)

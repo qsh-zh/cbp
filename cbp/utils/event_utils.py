@@ -9,8 +9,7 @@ def engine_loop(  # pylint: disable=too-many-arguments
         tolerance=1e-2,
         error_fun=None,
         meassure_fun=None,
-        isoutput=False,
-        silent=False):
+        isoutput=False):
     check_step = 1
     epsilons = [np.inf] * check_step
     start = time.time()
@@ -28,12 +27,6 @@ def engine_loop(  # pylint: disable=too-many-arguments
         epsilons.append(error_fun(cur_marginals, last_marginals))
 
         timer_record.append(time.time() - start)
-        if not silent:
-            print(
-                f"epsilon: {epsilons[-1]:5.4f} | step: {step:5d} {'-'*10}")
-            print(cur_marginals)
-            print(last_marginals)
-            print(epsilons)
         if isoutput:
             print(f'step: {step:5d} | verobose output {epsilons[-1]}')
 

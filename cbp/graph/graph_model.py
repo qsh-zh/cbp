@@ -9,12 +9,10 @@ from .discrete_graph import DiscreteGraph
 
 
 class GraphModel(DiscreteGraph):
-    def __init__(self, silent=True,
-                 coef_policy=bp_policy, config=baseconfig):
+    def __init__(self, coef_policy=bp_policy, config=baseconfig):
         super().__init__(coef_policy=coef_policy)
         self.cfg = config
         self.itsbp_outer_cnt = 0
-        self.silent = silent
 
     def add_varnode(self, node):
         """ add check node type and call parent checker
@@ -42,16 +40,16 @@ class GraphModel(DiscreteGraph):
         self.bake()
         return self.itsbp()
 
-    def norm_product_bp(self, max_iter=5000000, tolerance=1e-5, error_fun=None):
+    def norm_product_bp(self, error_fun=None):
         if error_fun is None:
             error_fun = diff_max_marginals
         self.first_belief_propagation()
         return self.engine_loop(
-            max_iter=max_iter,
+            max_iter=self.cfg.cnp_engine_iteration,
             engine_fun=self.parallel_message,
-            tolerance=tolerance,
+            tolerance=self.cfg.cnp_engine_tolerance,
             error_fun=error_fun,
-            isoutput=False)
+            isoutput=self.cfg.verbose_engine_cnp)
 
     def engine_loop(  # pylint: disable= too-many-arguments
             self,
@@ -69,9 +67,7 @@ class GraphModel(DiscreteGraph):
             tolerance=tolerance,
             error_fun=error_fun,
             meassure_fun=self.export_convergence_marginals,
-            isoutput=isoutput,
-            silent=self.silent
-        )
+            isoutput=isoutput)
 
         return epsilons, step
 
@@ -83,9 +79,9 @@ class GraphModel(DiscreteGraph):
         """
         self.first_belief_propagation()
         return self.engine_loop(self.itsbp_outer_loop,
-                                tolerance=1e-4,
+                                tolerance=self.cfg.itsbp_outer_tolerance,
                                 error_fun=diff_max_marginals,
-                                isoutput=False)
+                                isoutput=self.cfg.verbose_itsbp_outer)
 
     def its_next_looplink(self):
         target_node = self.leaf_nodes[self.itsbp_outer_cnt]
@@ -100,12 +96,12 @@ class GraphModel(DiscreteGraph):
     def itsbp_outer_loop(self):
         for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
-            itsbp_inner_loop(loop_link, self.silent)
+            itsbp_inner_loop(loop_link, self.cfg.verbose_node_send_msg)
 
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():
             # sendind in messages from factors
-            target_var.sendin_message(self.silent)
+            target_var.sendin_message(self.cfg.verbose_node_send_msg)
 
             if run_constrained or (not target_var.isconstrained):
-                target_var.sendout_message(self.silent)
+                target_var.sendout_message(self.cfg.verbose_node_send_msg)

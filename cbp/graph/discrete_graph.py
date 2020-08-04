@@ -190,8 +190,7 @@ class DiscreteGraph(BaseGraph):
                            tolerance=tolerance,
                            error_fun=diff_max_marginals,
                            meassure_fun=self.export_sinkhorn,
-                           isoutput=False,
-                           silent=True)
+                           isoutput=False)
 
     def cal_bethe(self, margin):
         """calculate bethe energy
