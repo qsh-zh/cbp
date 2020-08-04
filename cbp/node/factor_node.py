@@ -45,9 +45,9 @@ class FactorNode(DiscreteNode):
 
     def check_before_run(self, node_map):
         super().check_before_run(node_map)
-        self.check_potential(node_map)
+        self.check_dim(node_map)
 
-    def check_potential(self, node_map):
+    def check_dim(self, node_map):
         """ * check the discrete potential matrix dimension
 
         :param node_map: a map contains the var nodes

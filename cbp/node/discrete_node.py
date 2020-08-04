@@ -6,7 +6,7 @@ from cbp.utils.message import Message
 from .base_node import BaseNode
 
 
-class DiscreteNode(BaseNode):  # pylint: disable=too-many-instance-attributes
+class DiscreteNode(BaseNode):
     def __init__(self, node_coef, potential):
         """[summary]
 
@@ -19,7 +19,6 @@ class DiscreteNode(BaseNode):  # pylint: disable=too-many-instance-attributes
         self.node_coef = node_coef
         self.coef_ready = False
         self.epsilon = 1
-        self.parent = None
         self._potential = None
         self.potential = potential
         self.message_inbox = {}

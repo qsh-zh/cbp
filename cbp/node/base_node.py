@@ -9,6 +9,7 @@ class BaseNode(ABC):
         * ``name`` str: id for the node
         * ``connections`` list of str: a list of connected node names
         * ``connected_nodes`` map of nodes: name -> node
+        * ``parent`` traverse purpose
     """
 
     def __init__(self) -> None:
@@ -16,6 +17,7 @@ class BaseNode(ABC):
         """
         self.name = str(uuid.uuid4())
         self.node_degree = 0
+        self.parent = None
         self.connections = []
         self.connected_nodes = {}
 

@@ -15,7 +15,7 @@ class GOFactorNode(BaseNode):
         super().__init__()
         self.connections = connections
 
-    def discrete_var(self, varnode):
+    def _discrete_var(self, varnode):
         assert isinstance(varnode, GOVarNode)
         potenital = []
         for loc, scale in zip(self.loc, self.scale):
@@ -25,6 +25,6 @@ class GOFactorNode(BaseNode):
     def discrete(self):
         for node in self.connected_nodes.values():
             if isinstance(node, GOVarNode):
-                return self.discrete_var(node)
+                return self._discrete_var(node)
 
         raise RuntimeError("go factor has no GOVarNode")

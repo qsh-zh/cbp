@@ -91,7 +91,7 @@ class BaseGraph():
 
     def get_root(self):
         if len(self.leaf_nodes) == 0:
-            raise RuntimeError("graph contains circle")
+            raise RuntimeError("No leaf node find in the graph")
         return self.leaf_nodes[0]
 
     def get_node(self, name_str):
