@@ -227,6 +227,9 @@ class TrajSimulator(ABC):
 
         return self.record[key_word]
 
+    def get_emission_potential(self):
+        return self.record[PotentialType.EMISSION]
+
     def save(self):
         sim_path = f"{self.path}/sim.pkl"
         with open(sim_path, 'wb') as handle:

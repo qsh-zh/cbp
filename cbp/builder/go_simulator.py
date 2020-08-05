@@ -9,7 +9,7 @@ class ContinuousObserData(TrajData):
     @sensor.setter
     def sensor(self, sensor_data):
         assert sensor_data.shape[1] == self.time_step
-        dict.__setitem__(self, "fix_margin", sensor_data)
+        dict.__setitem__(self, "fix_margin", sensor_data.T)
 
 
 class GOHMMSimulator(TrajSimulator):
@@ -19,12 +19,11 @@ class GOHMMSimulator(TrajSimulator):
 
     def register_potential(self, ptype, potential):
         if ptype == PotentialType.EMISSION:
-            assert potential["loc"].shape == self.record.state_num
-            assert potential["scale"].shape == self.record.state_num
-            self.record.update(potential)
-        else:
-            super().register_potential(ptype, potential)
+            assert potential["loc"].shape == (self.record.state_num,)
+            assert potential["scale"].shape == (self.record.state_num,)
+
+        super().register_potential(ptype, potential)
 
     def observe(self, state):
-        return self.rng.normal(loc=self.record["loc"],
-                               scale=self.record["scale"])
+        return self.rng.normal(loc=self.record[PotentialType.EMISSION]["loc"][state],
+                               scale=self.record[PotentialType.EMISSION]["scale"][state])

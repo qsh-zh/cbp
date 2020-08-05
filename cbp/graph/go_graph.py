@@ -46,4 +46,5 @@ class GOGraph(BaseGraph):
                 self.discrete_graph.add_factornode(node.discrete())
 
     def run_bp(self):
+        self.bake()
         return self.discrete_graph.run_bp()

@@ -54,11 +54,10 @@ class BaseHMMSimBuilder(HMMBuilder):
     def example(self, num_sample):
         self.simulator.example(num_sample)
 
-    def compare_acc(self):
+    def compare_acc(self, graph):
         infer_marginal = []
         gt_marginal = []
         for i in range(0, self.hmm_length, 2):
-            infer_marginal.append(
-                self.graph.get_node(f'VarNode_{i:03d}').marginal())
+            infer_marginal.append(graph.get_node(f'VarNode_{i:03d}').marginal())
             gt_marginal.append(self.simulator.get_hidden_margin(i // 2))
         return np.sum(np.abs(np.array(infer_marginal) - np.array(gt_marginal)))

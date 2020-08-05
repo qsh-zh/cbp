@@ -1,5 +1,4 @@
 from cbp.node import FactorNode
-
 from .base_hmmsim_builder import BaseHMMSimBuilder
 
 
@@ -19,3 +18,6 @@ class HMMSimBuilder(BaseHMMSimBuilder):
         factornode = FactorNode(name_list, potential)
         self.graph.add_factornode(factornode)
         return factornode
+
+    def compare_acc(self):
+        return super().compare_acc(self.graph)

@@ -73,9 +73,6 @@ class HMMSimulator(TrajSimulator):
         fig.savefig(f"{self.path}/sensor.png")
         plt.close(fig)
 
-    def get_emission_potential(self):
-        return self.record[PotentialType.EMISSION]
-
     def get_precious(self, time_step=None, verbose=False):
         """return precious marginal
 

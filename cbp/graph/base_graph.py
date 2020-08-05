@@ -95,9 +95,18 @@ class BaseGraph():
         return self.leaf_nodes[0]
 
     def get_node(self, name_str):
-        if name_str not in self.node_recorder:
+        """access to the node in the graph
+
+        :param name_str: name of node
+        :type name_str: string
+        :raises RuntimeError: not in the graph
+        """
+        if name_str in self.varnode_recorder:
+            return self.varnode_recorder[name_str]
+        elif name_str in self.factornode_recorder:
+            return self.factornode_recorder[name_str]
+        else:
             raise RuntimeError(f"{name_str} is illegal, not in this graph")
-        return self.node_recorder[name_str]
 
     def delete_node(self, name_str):
         """delete node from graph, needs to check following

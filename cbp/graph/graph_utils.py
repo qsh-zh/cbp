@@ -17,7 +17,7 @@ def find_link(node_a, node_b):
     a_2root = get_node2root(node_a)
     b_2root = get_node2root(node_b)
     while (len(b_2root) > 1 and len(a_2root) > 1):
-        if b_2root[-1] == a_2root[-1] and b_2root[-2] == a_2root[-2]:
+        if b_2root[-1].name == a_2root[-1].name and b_2root[-2].name == a_2root[-2].name:
             b_2root.pop()
             a_2root.pop()
         else:
