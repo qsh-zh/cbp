@@ -40,8 +40,8 @@ class BaseBuilder(ABC):
         self.graph.add_varnode(varnode)
         return varnode
 
-    def add_factor(self, name_list, is_conv=False):
-        if is_conv:
+    def add_factor(self, name_list, is_obser=False):
+        if is_obser:
             factor_potential = diagonal_potential_conv(
                 self.node_dim, self.node_dim, self.rng)
         else:
@@ -51,8 +51,9 @@ class BaseBuilder(ABC):
         self.graph.add_factornode(factornode)
         return factornode
 
-    def add_factor_different(self, name_list, is_conv=False):
-        if is_conv:
+    # TODO: REMOVE IT
+    def add_factor_different(self, name_list, is_obser=False):
+        if is_obser:
             factor_potential = diagonal_potential_conv(
                 self.node_dim, self.node_dim, self.rng)
         else:
@@ -63,7 +64,7 @@ class BaseBuilder(ABC):
         return factornode
 
     def add_branch(self, head_node=None, is_constrained=False,
-                   prob=None, is_conv=False):
+                   prob=None, is_obser=False):
         if head_node is None:
             head_node = f"VarNode_{self.graph.cnt_varnode-1:03d}"
         if is_constrained:
@@ -72,7 +73,7 @@ class BaseBuilder(ABC):
             node = self.add_trivial_node()
 
         name_list = [head_node, node.name]
-        self.add_factor(name_list, is_conv)
+        self.add_factor(name_list, is_obser)
 
     @abstractmethod
     def init_graph(self):

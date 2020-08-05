@@ -9,7 +9,7 @@ class HMMZeroBuilder(HMMBuilder):
     def __init__(self, length, d, policy, rand_seed=1):
         super().__init__(length, d, policy, rand_seed=rand_seed)
 
-    def add_factor(self, name_list, is_conv=False):
+    def add_factor(self, name_list, is_obser=False):
         factor_potential = identity_potential(
             self.node_dim, self.node_dim, self.rng)
         factornode = FactorNode(name_list, factor_potential)

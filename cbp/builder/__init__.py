@@ -12,6 +12,7 @@ from .star_builder import StarBuilder
 from .tree_builder import TreeBuilder
 from .wifi_hmm_builder import WifiHMMBuilder
 from .wifi_simulator import WifiSimulator
+from .hmm_gosim_builder import HMMGOSimBuilder
 
 __all__ = [
     "HMMBuilder",
@@ -27,5 +28,6 @@ __all__ = [
     "PotentialType",
     "HMMSimBuilder",
     "HMMEngine",
-    "GOHMMSimulator"
+    "GOHMMSimulator",
+    "HMMGOSimBuilder"
 ]
