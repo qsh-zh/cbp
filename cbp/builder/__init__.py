@@ -1,5 +1,6 @@
 from .base_builder import BaseBuilder
 from .base_simulator import PotentialType
+from .go_simulator import GOHMMSimulator
 from .hmm_builder import HMMBuilder
 from .hmm_engine import HMMEngine
 from .hmm_sim_builder import HMMSimBuilder
@@ -25,5 +26,6 @@ __all__ = [
     "HMMSimulator",
     "PotentialType",
     "HMMSimBuilder",
-    "HMMEngine"
+    "HMMEngine",
+    "GOHMMSimulator"
 ]
