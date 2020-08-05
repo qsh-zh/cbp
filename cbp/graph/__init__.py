@@ -10,6 +10,6 @@ __all__ = [
     "DiscreteGraph",
     "GraphModel",
     "GOGraph",
-    "bp_policy"
+    "bp_policy",
     "coef_policy"
 ]
