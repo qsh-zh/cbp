@@ -1,12 +1,11 @@
-import unittest
 import timeit
+import unittest
+from test.utils import sinkhorn_bp_equal, two_node_tree
 
 import numpy as np
 from cbp.builder import HMMBuilder, HMMZeroBuilder, LineBuilder
-from cbp.graph.coef_policy import bp_policy
 from cbp.configs import TestConfig
-
-from test.utils import sinkhorn_bp_equal, two_node_tree
+from cbp.graph.coef_policy import bp_policy
 
 
 def next_links(graph):
@@ -83,7 +82,7 @@ class TestITSbp(unittest.TestCase):
                 graph.cfg = cfg
             graph.run_bp()
 
-    @unittest.skip("Expensive test!")
+    @unittest.skip("Proved! Loopy schedule is fast!")
     def test_cmp_schedule(self):
         print(timeit.timeit(
             lambda: self._profile_hmm_schedule(

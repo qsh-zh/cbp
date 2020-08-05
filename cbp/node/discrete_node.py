@@ -93,27 +93,27 @@ class DiscreteNode(BaseNode):
         :rtype: float
         """
 
-    def send_message(self, recipient_node, is_silent=True):
+    def send_message(self, recipient_node, verbose=False):
         """send message from this node to target node
 
         :param recipient_node: target node
-        :param is_silent: debug, defaults to True
-        :type is_silent: bool, optional
+        :param verbose: debug, defaults to False
+        :type verbose: bool, optional
         """
         val = self.make_message(recipient_node)
         message = Message(self, val)
         recipient_node.store_message(message)
-        if not is_silent:
+        if verbose:
             print(self.name + '->' + recipient_node.name)
             print(message.val)
 
-    def sendin_message(self, is_silent=True):
+    def sendin_message(self, verbose=False):
         for connected_node in self.connected_nodes.values():
-            connected_node.send_message(self, is_silent)
+            connected_node.send_message(self, verbose)
 
-    def sendout_message(self, is_silent=True):
+    def sendout_message(self, verbose=False):
         for connected_node in self.connected_nodes.values():
-            self.send_message(connected_node, is_silent)
+            self.send_message(connected_node, verbose)
 
     def search_msg_index(self, message_list, node_name):
         which_index = [i for i, message in enumerate(message_list)

@@ -29,12 +29,12 @@ def find_link(node_a, node_b):
     return a_2root[:-1] + b_2root[:]
 
 
-def itsbp_inner_loop(loop_link, is_silent):
+def itsbp_inner_loop(loop_link, verbose):
     if len(loop_link) == 2:
         return
 
     for sender, receiver in zip(loop_link[0:-1], loop_link[1:]):
-        sender.send_message(receiver, is_silent)
+        sender.send_message(receiver, verbose)
 
 
 def cal_marginal_from_tensor(prob_tensor, varnode_list):

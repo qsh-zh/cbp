@@ -33,7 +33,7 @@ class VarNode(DiscreteNode):
         if potential is None:
             return np.ones([self.rv_dim])
         assert potential.shape[0] == self.rv_dim
-        return potential
+        return np.clip(potential, 1e-12, None)
 
     def auto_coef(self, node_map, assign_policy=None):
         super().auto_coef(node_map, assign_policy)

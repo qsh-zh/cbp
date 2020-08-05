@@ -1,3 +1,4 @@
+import numpy as np
 from cbp.node import FactorNode
 
 from .hmm_builder import HMMBuilder
@@ -13,7 +14,7 @@ class HMMSimBuilder(HMMBuilder):
     def fix_initpotential(self, potential=None):
         first_node = self.graph.get_node(f"VarNode_{0:03d}")
         if potential is None:
-            potential = self.simulator.get_hidden_margin(0)
+            potential = self.simulator.get_init_potential()
         first_node.potential = potential
 
     def add_constrained_node(self, probability=None):
@@ -49,3 +50,12 @@ class HMMSimBuilder(HMMBuilder):
     def example(self, num_sample):
         self.simulator.reset()
         self.simulator.example(num_sample)
+
+    def compare_acc(self):
+        infer_marginal = []
+        gt_marginal = []
+        for i in range(0, self.hmm_length, 2):
+            infer_marginal.append(
+                self.graph.get_node(f'VarNode_{i:03d}').marginal())
+            gt_marginal.append(self.simulator.get_hidden_margin(i // 2))
+        return np.sum(np.abs(np.array(infer_marginal) - np.array(gt_marginal)))
