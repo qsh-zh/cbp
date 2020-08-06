@@ -55,18 +55,6 @@ class BaseBuilder(ABC):
         self.graph.add_factornode(factornode)
         return factornode
 
-    # TODO: REMOVE IT
-    def add_factor_different(self, name_list, is_obser=False):
-        if is_obser:
-            factor_potential = diagonal_potential_conv(
-                self.node_dim, self.node_dim, self.rng)
-        else:
-            factor_potential = diagonal_potential_different(
-                self.node_dim, self.node_dim, self.rng)
-        factornode = FactorNode(name_list, factor_potential)
-        self.graph.add_factornode(factornode)
-        return factornode
-
     def add_branch(self, head_node=None, is_constrained=False,
                    prob=None, is_obser=False):
         if head_node is None:

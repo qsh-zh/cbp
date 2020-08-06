@@ -3,8 +3,6 @@ import numpy as np
 from cbp.builder import GOHMMSimulator, HMMGOSimBuilder, PotentialType
 from cbp.graph import bp_policy
 
-# TODO:
-
 
 def construct_init(dim):
     init = np.array([(dim - i) for i in range(dim)])
