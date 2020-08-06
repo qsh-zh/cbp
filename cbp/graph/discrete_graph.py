@@ -46,7 +46,6 @@ class DiscreteGraph(BaseGraph):
             raise RuntimeError
         node = self.node_recorder[node_name]
         if potential is not None:
-            # TODO: make potential property check, when do set
             node.potential = potential
         if isconstrained is not None:
             if node.isconstrained != isconstrained:
