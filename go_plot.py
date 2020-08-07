@@ -6,7 +6,7 @@ cmdhelper = ppk.CmdHelper(GOBnechCfg)
 
 cmds = ppk.param_sweep(
     prefix=None,
-    hmm_length=range(2, 100, 2),
+    hmm_length=range(2, 90, 2),
     seed=range(10))
 
 
@@ -20,7 +20,7 @@ def draw(cmds, exp_vary, metric, fig_name):
 
         executor = GOBenchExecutor.load(
             f"{parser.pkl_path()}/{parser.pkl_name()}.pkl")
-        data["go_gaussian"][parser.hmm_length].append(
+        data["go_gaussian"][getattr(parser, exp_vary)].append(
             executor.exp_record[metric])
 
     ax = ppk.meanstd_plot(data, {"go_gaussian": ""}, is_label=False)
@@ -28,4 +28,4 @@ def draw(cmds, exp_vary, metric, fig_name):
 
 
 draw(cmds, 'hmm_length', 'step', 'length_step.png')
-draw(cmds, 'hmm_length', 'time', 'length_step.png')
+draw(cmds, 'hmm_length', 'time', 'length_time.png')

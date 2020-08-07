@@ -15,8 +15,8 @@ class GOBenchExecutor(_Drawer):
     def construct_sim(self):
         sim = GOHMMSimulator(
             self.cfg.hmm_length,
-            self.cfg.grid_w,
-            self.cfg.grid_h)
+            self.cfg.grid_w * self.cfg.grid_h,
+            self.cfg.seed)
         sim.register_potential(PotentialType.INIT, self.cfg.construct_init())
         sim.register_potential(PotentialType.TRANSITION,
                                self.cfg.construct_shift_trans())
