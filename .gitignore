@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 docs/_build
 data/
+go_exp/
 .vscode/
 tmp
 
