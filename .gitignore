@@ -6,6 +6,7 @@ docs/_build
 data/
 go_exp/
 .vscode/
+*.png
 tmp
 
 # C extensions

@@ -43,8 +43,8 @@ class GOBenchExecutor(_Drawer):
 
 if __name__ == "__main__":
     from go_bench_cfg import GOBnechCfg
-    from paperkit import cfg_from_cmd
-    cfg = GOBnechCfg()
-    cfg_from_cmd(cfg)
+    from paperkit import CmdHelper
+    helper = CmdHelper(GOBnechCfg)
+    cfg, _ = helper.cfg_from_cmd()
     worker = GOBenchExecutor(cfg)
     worker.run_exp()
