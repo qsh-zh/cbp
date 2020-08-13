@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import norm, multivariate_normal
 
 from .base_node import BaseNode
 from .factor_node import FactorNode
@@ -18,8 +18,10 @@ class GOFactorNode(BaseNode):
     def _discrete_var(self, varnode):
         assert isinstance(varnode, GOVarNode)
         potenital = []
+        pdf_func = multivariate_normal if varnode.is_multi else norm
         for loc, scale in zip(self.loc, self.scale):
-            potenital.append(norm.pdf(varnode.bins, loc=loc, scale=scale))
+            potenital.append(pdf_func(loc, scale).pdf(varnode.bins))
+            # potenital.append(norm.pdf(varnode.bins, loc=loc, scale=scale))
         return FactorNode(self.connections, np.array(potenital))
 
     def discrete(self):
