@@ -47,7 +47,6 @@ setup(
         'scipy',
         'matplotlib',
         'seaborn',
-        'pygraphviz',
         'numba',
         'hmmlearn'
     ],
@@ -57,6 +56,7 @@ setup(
             'sphinx_rtd_theme',
             'nbsphinx',
             'sphinxcontrib-bibtex',
+            'pygraphviz',
             'pylint',
             'pytest',
             'pytest-cov',
