@@ -61,7 +61,7 @@ class GraphModel(DiscreteGraph):
         if error_fun is None:
             error_fun = compare_marginals
 
-        epsilons, step, _ = engine_loop(
+        epsilons, step, timer = engine_loop(
             engine_fun=engine_fun,
             max_iter=max_iter,
             tolerance=tolerance,
@@ -69,7 +69,7 @@ class GraphModel(DiscreteGraph):
             meassure_fun=self.export_convergence_marginals,
             isoutput=isoutput)
 
-        return epsilons, step
+        return epsilons, step, timer
 
     def itsbp(self):
         """run sinkhorn or iterative scaling inference
