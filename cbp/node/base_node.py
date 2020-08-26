@@ -5,7 +5,7 @@ import numpy as np
 
 class BaseNode(ABC):
     """All kinds node must inherit :class:`~cbp.node.BaseNode`. It
-    provide the basic register connection functions. Important attr.
+    provide the basic graph connection property. Important attr.
         * ``name`` str: id for the node
         * ``connections`` list of str: a list of connected node names
         * ``connected_nodes`` map of nodes: name -> node

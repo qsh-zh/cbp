@@ -7,6 +7,9 @@ from .base_node import BaseNode
 
 
 class DiscreteNode(BaseNode):
+    """message passing interfaces
+    """
+
     def __init__(self, node_coef, potential):
         """[summary]
 
