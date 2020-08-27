@@ -17,14 +17,21 @@ def construct_potential(list_var, list_factor):
 
 
 class MOTNode(MsgNode):
-    def __init__(self, list_var, list_factor):
+    def __init__(self, list_var, list_factor=[]):
         self.list_var = list_var
         self.list_name = [node.name for node in list_var]
         self.list_factor = list_factor
+        self.mot_name = self.extract_name()
         super().__init__(construct_potential(list_var, list_factor))
 
     def idx_dims(self, node):
         return [self.list_name.index(name) for name in node.list_name]
+
+    def extract_name(self):
+        connected_vars = []
+        for node_name in self.list_name:
+            connected_vars.append(int(node_name[-3:]))
+        return ','.join(map(str, connected_vars))
 
     def make_init_message(self, recipient_node_name):
         recipient_node = self.connected_nodes[recipient_node_name]

@@ -1,9 +1,11 @@
 # TODO
 
-- [ ] add graph structure API and its test(should work)
-- [ ] test build MOTNode potential
-- [ ] test make message for cluster and seperator
-- [ ] split discrete node as cnp_node and discrete(opnly work for manage message)
+- [x] add graph structure API and its test(should work)
+- [x] test build MOTNode potential
+- [x] test make message for cluster and seperator
+- [x] split discrete node as cnp_node and discrete(opnly work for manage message)
+- [ ] plot utils
+- [ ] constrained cluster case
 
 
 # CBP(Constrained Belief Propagation)

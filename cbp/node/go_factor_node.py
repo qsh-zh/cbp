@@ -15,6 +15,9 @@ class GOFactorNode(BaseNode):
         super().__init__()
         self.connections = connections
 
+    def __impl__update_connection(self):
+        return [name[2:] if 'GO' in name else name for name in self.connections]
+
     def _discrete_var(self, varnode):
         assert isinstance(varnode, GOVarNode)
         potenital = []
@@ -22,7 +25,7 @@ class GOFactorNode(BaseNode):
         for loc, scale in zip(self.loc, self.scale):
             potenital.append(pdf_func(loc, scale).pdf(varnode.bins))
             # potenital.append(norm.pdf(varnode.bins, loc=loc, scale=scale))
-        return FactorNode(self.connections, np.array(potenital))
+        return FactorNode(self.__impl__update_connection(), np.array(potenital))
 
     def discrete(self):
         for node in self.connected_nodes.values():

@@ -10,3 +10,11 @@ class MOTSeperator(MOTNode):
             product_out,
             recipient_node.potential.shape,
             multi_idx)
+
+    def plot(self, graph):
+        graph.add_node(
+            self.name,
+            color='blue',
+            style='bold',
+            shape='box',
+            label=self.mot_name)

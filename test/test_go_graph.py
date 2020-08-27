@@ -13,7 +13,7 @@ class TestGOGraph(unittest.TestCase):
     def test_factor_discrete(self):
         num_obser = 5
         dim = 10
-        connected_names = ['VarNode_000', 'VarNode_001']
+        connected_names = ['VarNode_000', 'GOVarNode_001']
         observation = self.rng.normal(size=num_obser)
         mu = self.rng.normal(size=dim)
         sigma = self.rng.uniform(size=dim)
@@ -25,10 +25,12 @@ class TestGOGraph(unittest.TestCase):
         go_graph = GOGraph()
         go_graph.add_varnode(var)
         go_graph.add_varnode(go_var)
+        print(go_graph.varnode_recorder)
         go_graph.add_factornode(factor)
         go_graph.bake()
         discrete_graph = go_graph.discrete_graph
 
+        var.connections = ['FactorNode_000']
         self.assertEqual(var, discrete_graph.get_node('VarNode_000'))
 
         target_var = VarNode(
@@ -44,8 +46,9 @@ class TestGOGraph(unittest.TestCase):
             target_potential.append(norm.pdf(observation,
                                              loc=mu[i], scale=sigma[i]))
         target_factor = FactorNode(
-            connected_names,
+            ['VarNode_000', 'VarNode_001'],
             np.array(target_potential))
+        target_factor.name = 'FactorNode_000'
 
         self.assertEqual(
             target_factor,

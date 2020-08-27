@@ -16,8 +16,6 @@ class GOGraph(BaseGraph):
 
     def bake(self):
         super().bake()
-        for node in self.nodes:
-            node.register_nodes(self.node_recorder)
 
         self.construct_discrete_graph()
 

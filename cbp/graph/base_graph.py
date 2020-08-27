@@ -33,35 +33,35 @@ class BaseGraph():
         :return: name of var node
         :rtype: str
         """
-        varnode_name = f"VarNode_{self.cnt_varnode:03d}"
+        varnode_name = f"{node.__class__.__name__}_{self.cnt_varnode:03d}"
         node.format_name(varnode_name)
         self.varnode_recorder[varnode_name] = node
 
         self.cnt_varnode += 1
         return varnode_name
 
-    def add_factornode(self, factornode):
+    def add_factornode(self, node):
         """add one factor node to the graph
         Do the following tasks
 
         *set factornode name attr
-        * add node to recorder
+        * add factornode to recorder
         * set connections
         * set parent relation
 
-        :param factornode: one factor node
+        :param node: one factor node
         :return: name of factor node
         :rtype: str
         """
-        factornode_name = f"FactorNode_{self.cnt_factornode:03d}"
-        factornode.format_name(factornode_name)
-        self.factornode_recorder[factornode_name] = factornode
+        node_name = f"{node.__class__.__name__}_{self.cnt_factornode:03d}"
+        node.format_name(node_name)
+        self.factornode_recorder[node_name] = node
 
-        self.__register_connection(factornode)
-        self.__set_parent(factornode)
+        self.__register_connection(node)
+        self.__set_parent(node)
 
         self.cnt_factornode += 1
-        return factornode_name
+        return node_name
 
     def __register_connection(self, factornode):
         for varnode_name in factornode.connections:
@@ -77,6 +77,8 @@ class BaseGraph():
 
     def bake(self):
         self.init_node_list()
+        for node in self.nodes:
+            node.register_nodes(self.node_recorder)
 
     def init_node_list(self):
         factors = list(self.factornode_recorder.values())
