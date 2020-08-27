@@ -35,9 +35,7 @@ class CnpNode(MsgNode):
 
     def make_init_message(self, recipient_node_name):
         if self.coef_ready:
-            recipient_node = self.connected_nodes[recipient_node_name]
-            message_dim = recipient_node.potential.shape
-            return np.ones(message_dim)
+            return super().make_init_message(recipient_node_name)
 
         raise RuntimeError(
             f"Need to call cal_cnp_coef first for {self.name}")

@@ -42,13 +42,15 @@ class MsgNode(BaseNode):
         :rtype: np.ndarray
         """
 
-    @abstractmethod
     def make_init_message(self, recipient_node_name):
         """make init messsage to neighbor
 
         :param recipient_node_name: neighbor node
         :type recipient_node_name: str
         """
+        recipient_node = self.connected_nodes[recipient_node_name]
+        message_dim = recipient_node.potential.shape
+        return np.ones(message_dim)
 
     # keep all message looks urgly. convenient for debug and resource occupied
     # is not so huge
