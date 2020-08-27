@@ -1,4 +1,4 @@
-from cbp.utils.np_utils import reduction_ndarray
+from cbp.utils.np_utils import nd_reduce
 
 
 def get_node2root(node):
@@ -40,5 +40,5 @@ def itsbp_inner_loop(loop_link, verbose):
 def cal_marginal_from_tensor(prob_tensor, varnode_list):
     rtn_marginal = []
     for i, _ in enumerate(varnode_list):
-        rtn_marginal.append(reduction_ndarray(prob_tensor, i))
+        rtn_marginal.append(nd_reduce(prob_tensor, i))
     return rtn_marginal

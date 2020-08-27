@@ -61,6 +61,23 @@ class MsgNode(BaseNode):
     def reset(self):
         self.message_inbox.clear()
 
+    def prod2node(self, recipient_node):
+        latest_message = self.latest_message
+        filtered_message = [message for message in latest_message
+                            if not message.sender.name == recipient_node.name]
+
+        message_val = np.array([message.val for message in filtered_message])
+
+        prod_messages = np.prod(message_val, axis=0)
+
+        product_out = np.multiply(self.potential, prod_messages)
+        return product_out
+
+    def prodmsg(self):
+        message_val = np.array([message.val for message in self.latest_message])
+        prod_messages = np.prod(message_val, axis=0)
+        return np.multiply(self.potential, prod_messages)
+
     # TODO: FIXAPI NAME
     @abstractmethod
     def make_message(self, recipient_node) -> np.ndarray:

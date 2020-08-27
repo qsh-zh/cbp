@@ -1,5 +1,5 @@
 import numpy as np
-from cbp.utils.np_utils import nd_expand
+from cbp.utils.np_utils import nd_expand, nd_reduce
 
 from .cnp_node import CnpNode
 
@@ -124,19 +124,22 @@ class FactorNode(CnpNode):
         value = np.power(base, coef_exp)
         return value
 
+    def prod2node(self, recipient_node):
+        rtn = super().prod2node(recipient_node)
+        self.last_innerparenthese_msg[recipient_node.name] = rtn
+        return rtn
+
     def make_message(self, recipient_node):
         assert recipient_node.name in self.connections
         if len(self.connections) == 1:
             self.last_innerparenthese_msg[recipient_node.name] = self.potential
             return self.summation(self.potential, recipient_node)
 
-        product_out = self.cal_inner_parentheses(recipient_node)
+        product_out = self.prod2node(recipient_node)
 
         with np.errstate(divide='raise'):
             hat_c_ialpha = self.hat_c_ialpha[recipient_node.name]
-            log_media = 1.0 / hat_c_ialpha * \
-                np.log(np.clip(product_out, 1e-12, None))
-            product_out_power = np.exp(log_media)
+            product_out_power = np.power(product_out, 1.0 / hat_c_ialpha)
             return np.power(
                 self.summation(
                     product_out_power,
@@ -148,24 +151,9 @@ class FactorNode(CnpNode):
         return np.sum(margin * np.log(margin / clip_potential))
 
     def marginal(self):
-        message_val = np.array([message.val for message in self.latest_message])
-        prod_messages = np.prod(message_val, axis=0)
-        product_out = np.multiply(self.potential, prod_messages)
+        product_out = self.prodmsg()
         unormalized = np.power(product_out, 1.0 / self.node_coef)
         return unormalized / np.sum(unormalized)
-
-    def cal_inner_parentheses(self, recipient_node):
-        latest_message = self.latest_message
-        filtered_message = [message for message in latest_message
-                            if not message.sender.name == recipient_node.name]
-
-        message_val = np.array([message.val for message in filtered_message])
-
-        prod_messages = np.prod(message_val, axis=0)
-
-        product_out = np.multiply(self.potential, prod_messages)
-        self.last_innerparenthese_msg[recipient_node.name] = product_out
-        return product_out
 
     def store_message(self, message):
         assert message.val.shape == self.potential.shape, \
@@ -184,8 +172,7 @@ class FactorNode(CnpNode):
         potential_dim = potential.shape
         node_index = self.connections.index(node.name)
         assert potential_dim[node_index] == node.rv_dim
-        return potential.sum(
-            tuple(j for j in range(potential.ndim) if j != node_index))
+        return nd_reduce(potential, node_index)
 
     def __eq__(self, value):
         if isinstance(value, FactorNode):

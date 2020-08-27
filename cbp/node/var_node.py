@@ -115,9 +115,7 @@ class VarNode(CnpNode):
         if self.isconstrained:
             return self.constrained_marginal
         if self.message_inbox:
-            vals = [message.val for message in self.latest_message]
-            vals_prod = np.prod(vals, axis=0)
-            prod = self.potential * vals_prod
+            prod = self.prodmsg()
             belief = np.power(prod, 1.0 / self.hat_c_i)
             return belief / np.sum(belief)
 

@@ -42,8 +42,7 @@ def nd_expand(inputdata, target_shape, expand_dim):
     return rtn
 
 
-@njit
-def reduction_ndarray(ndarray, reduction_index):
+def nd_reduce(ndarray, reduction_index):
     """reduct ndarray according to one index
 
     :param ndarray: [description]
@@ -53,10 +52,12 @@ def reduction_ndarray(ndarray, reduction_index):
     :return: [description]
     :rtype: ndarray
     """
-    rtn = np.zeros(ndarray.shape[reduction_index])
-    for idx, value in np.ndenumerate(ndarray):
-        rtn[idx[reduction_index]] += value
-    return rtn
+    return nd_multireduce(ndarray, [reduction_index])
+
+
+def nd_multireduce(ndarray, idxes):
+    sum_idx = tuple(i for i in range(ndarray.ndim) if i not in idxes)
+    return ndarray.sum(axis=sum_idx)
 
 
 @njit

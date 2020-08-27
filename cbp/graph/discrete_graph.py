@@ -4,7 +4,7 @@ import numpy as np
 from cbp.utils import (Message, diff_max_marginals,
                        engine_loop)
 from cbp.utils.np_utils import (nd_expand, nd_multiexpand,
-                                reduction_ndarray)
+                                nd_reduce)
 from .coef_policy import bp_policy
 from .graph_utils import cal_marginal_from_tensor
 
@@ -162,7 +162,7 @@ class DiscreteGraph(BaseGraph):
             normalized_denominator = (big_u * tilde_c) / \
                 np.sum(big_u * tilde_c)
 
-            copy_denominator = reduction_ndarray(
+            copy_denominator = nd_reduce(
                 normalized_denominator, recorder['index'])
             copy_denominator = np.clip(copy_denominator, 1e-12, None)
             recorder['u'] = recorder['u'] * recorder['mu'] / copy_denominator
