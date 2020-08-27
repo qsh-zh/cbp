@@ -105,7 +105,6 @@ class MsgNode(BaseNode):
 
     def __eq__(self, value):
         flag = []
-        flag.append((np.isclose(self.node_coef, value.node_coef)).all())
         flag.append(np.isclose(self.potential, value.potential).all())
         if np.sum(flag) == len(flag):
             return super().__eq__(value)

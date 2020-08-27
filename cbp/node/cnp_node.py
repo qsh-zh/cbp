@@ -3,8 +3,10 @@ import numpy as np
 from .msg_node import MsgNode
 
 
-
 class CnpNode(MsgNode):
+    """cnp-type node, set and calculate coef
+    """
+
     def __init__(self, node_coef, potential):
         super().__init__(potential)
         self.node_coef = node_coef
