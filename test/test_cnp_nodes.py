@@ -3,7 +3,7 @@ import numpy as np
 from cbp.node import VarNode, FactorNode
 
 
-class TestDiscreteNode(unittest.TestCase):
+class TestCnpNode(unittest.TestCase):
     def setUp(self):
         self.rng = np.random.RandomState(1)
 

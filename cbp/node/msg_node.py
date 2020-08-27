@@ -6,11 +6,11 @@ from cbp.utils.message import Message
 from .base_node import BaseNode
 
 
-class DiscreteNode(BaseNode):
+class MsgNode(BaseNode):
     """message passing interfaces
     """
 
-    def __init__(self, node_coef, potential):
+    def __init__(self, potential):
         """[summary]
 
         :param node_coef: works for the norm-product algorithm
@@ -19,21 +19,10 @@ class DiscreteNode(BaseNode):
         :type potential: ndarray or list
         """
         super().__init__()
-        self.node_coef = node_coef
-        self.coef_ready = False
-        self.epsilon = 1
         self._potential = None
         self.potential = potential
         self.message_inbox = {}
         self.latest_message = []
-
-    def auto_coef(self, node_map, assign_policy=None):
-        if assign_policy is None:
-            self.node_coef = 1.0 / len(node_map)
-        else:
-            self.node_coef = assign_policy(self, node_map)
-
-        self.register_nodes(node_map)
 
     @property
     def potential(self):
@@ -53,18 +42,13 @@ class DiscreteNode(BaseNode):
         :rtype: np.ndarray
         """
 
-    def cal_cnp_coef(self):
-        raise NotImplementedError(
-            f"{self.__class__.__name__} is an abstract class")
-
+    @abstractmethod
     def make_init_message(self, recipient_node_name):
-        if self.coef_ready:
-            recipient_node = self.connected_nodes[recipient_node_name]
-            message_dim = recipient_node.potential.shape
-            return np.ones(message_dim)
+        """make init messsage to neighbor
 
-        raise RuntimeError(
-            f"Need to call cal_cnp_coef first for {self.name}")
+        :param recipient_node_name: neighbor node
+        :type recipient_node_name: str
+        """
 
     # keep all message looks urgly. convenient for debug and resource occupied
     # is not so huge
@@ -86,14 +70,6 @@ class DiscreteNode(BaseNode):
         :type recipient_node: [type]
         :return: content of the message
         :rtype: np.ndarray
-        """
-
-    @abstractmethod
-    def cal_bethe(self, margin) -> float:
-        """calculate the bethe energy
-
-        :return: bethe energy on this node
-        :rtype: float
         """
 
     def send_message(self, recipient_node, verbose=False):

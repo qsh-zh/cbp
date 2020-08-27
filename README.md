@@ -1,3 +1,11 @@
+# TODO
+
+- [ ] add graph structure API and its test(should work)
+- [ ] test build MOTNode potential
+- [ ] test make message for cluster and seperator
+- [ ] split discrete node as cnp_node and discrete(opnly work for manage message)
+
+
 # CBP(Constrained Belief Propagation)
 
 Constrained Belief Progapation is a package for solving inference tasks with collective\aggregate evidence.

@@ -1,10 +1,10 @@
 import numpy as np
 from cbp.utils.np_utils import nd_expand
 
-from .discrete_node import DiscreteNode
+from .cnp_node import CnpNode
 
 
-class VarNode(DiscreteNode):
+class VarNode(CnpNode):
     """Variable Node in Factor graph
 
         Add new attr:

@@ -1,10 +1,10 @@
 import numpy as np
 from cbp.utils.np_utils import nd_expand
 
-from .discrete_node import DiscreteNode
+from .cnp_node import CnpNode
 
 
-class FactorNode(DiscreteNode):
+class FactorNode(CnpNode):
     """Factor Node in factor graph.
       Add new attr:
         * ``isconstrained`` Fixed marginal or not
