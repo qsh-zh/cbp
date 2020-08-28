@@ -3,10 +3,11 @@ from cbp.utils import (compare_marginals, diff_max_marginals,
                        engine_loop, Message)
 
 from .graph_utils import itsbp_inner_loop, find_link
+from cbp.configs.base_config import baseconfig
 
 
 class MsgGraph(ConstrainGraph):
-    def __init__(self, config):
+    def __init__(self, config=baseconfig):
         super().__init__()
         self.cfg = config
         self.itsbp_outer_cnt = 0
@@ -113,7 +114,7 @@ class MsgGraph(ConstrainGraph):
         for node in self.nodes:
             for recipient_name in node.connections:
                 recipient = self.node_recorder[recipient_name]
-                if recipient.name not in node.message_inbox:
+                if node.name not in recipient.message_inbox:
                     val = node.make_init_message(recipient_name)
                     message = Message(node, val)
                     self.node_recorder[recipient_name].store_message(message)

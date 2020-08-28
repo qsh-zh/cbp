@@ -60,6 +60,10 @@ def nd_multireduce(ndarray, idxes):
     return ndarray.sum(axis=sum_idx)
 
 
+def isequal(first, second):
+    return np.isclose(first, second).all()
+
+
 @njit
 def batch_normal_angle(angle):
     delta_x = np.cos(angle)

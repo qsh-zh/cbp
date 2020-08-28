@@ -20,12 +20,10 @@ class MOTNode(MsgNode):
     def __init__(self, list_var, list_factor=[]):
         self.list_var = list_var
         self.list_name = [node.name for node in list_var]
+        self.rv_dim = len(list_var)
         self.list_factor = list_factor
         self.mot_name = self.extract_name()
         super().__init__(construct_potential(list_var, list_factor))
-
-    def idx_dims(self, node):
-        return [self.list_name.index(name) for name in node.list_name]
 
     def extract_name(self):
         connected_vars = []
@@ -40,3 +38,18 @@ class MOTNode(MsgNode):
 
     def _check_potential(self, potential):
         return potential
+
+    def marginal(self):
+        unnormalized = self.prodmsg()
+        marginal = unnormalized / np.sum(unnormalized)
+        setattr(self, 'cached_marginal', marginal)
+        return marginal
+
+    def marginal_dims(self, str_dims):
+        dims = [self.list_name.index(name) for name in str_dims]
+        if not hasattr(self, 'cached_marginal'):
+            marginal = self.marginal()
+        else:
+            marginal = self.cached_marginal
+
+        return npu.nd_multireduce(marginal, dims)
