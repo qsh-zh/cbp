@@ -10,7 +10,7 @@ class MOTCluster(MOTNode):
             self.constrained_marginal = list_var[0].constrained_marginal
         else:
             self.isconstrained = False
-        self.connections = connections.copy()
+        self.connections = connections
 
     def make_message(self, recipient_node):
         if self.isconstrained:

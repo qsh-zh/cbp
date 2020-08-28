@@ -4,8 +4,11 @@
 - [x] test build MOTNode potential
 - [x] test make message for cluster and seperator
 - [x] split discrete node as cnp_node and discrete(opnly work for manage message)
-- [ ] plot utils
-- [ ] constrained cluster case
+- [x] plot utils
+- [x] constrained cluster case
+- [ ] orgnize the message passing
+- [ ] remove the itsbp to high level
+- [ ] three components of the engine function
 
 
 # CBP(Constrained Belief Propagation)

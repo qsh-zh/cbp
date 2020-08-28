@@ -10,9 +10,7 @@ from .discrete_graph import DiscreteGraph
 
 class GraphModel(DiscreteGraph):
     def __init__(self, coef_policy=bp_policy, config=baseconfig):
-        super().__init__(coef_policy=coef_policy)
-        self.cfg = config
-        self.itsbp_outer_cnt = 0
+        super().__init__(config, coef_policy=coef_policy)
 
     def add_varnode(self, node):
         """ add check node type and call parent checker
@@ -51,57 +49,16 @@ class GraphModel(DiscreteGraph):
             error_fun=error_fun,
             isoutput=self.cfg.verbose_engine_cnp)
 
-    def engine_loop(  # pylint: disable= too-many-arguments
-            self,
-            engine_fun,
-            max_iter=5000000,
-            tolerance=1e-2,
-            error_fun=None,
-            isoutput=False):
-        if error_fun is None:
-            error_fun = compare_marginals
+    def cal_bethe(self, margin):
+        """calculate bethe energy
 
-        epsilons, step, timer = engine_loop(
-            engine_fun=engine_fun,
-            max_iter=max_iter,
-            tolerance=tolerance,
-            error_fun=error_fun,
-            meassure_fun=self.export_convergence_marginals,
-            isoutput=isoutput)
-
-        return epsilons, step, timer
-
-    def itsbp(self):
-        """run sinkhorn or iterative scaling inference
-
-        :return: [description]
-        :rtype: [type]
+        :param margin: node_name : margin
+        :type margin: dict
+        :return: KL divergence between expoert joint dist and p_graph
+        :rtype: float
         """
-        self.first_belief_propagation()
-        return self.engine_loop(self.itsbp_outer_loop,
-                                tolerance=self.cfg.itsbp_outer_tolerance,
-                                error_fun=diff_max_marginals,
-                                isoutput=self.cfg.verbose_itsbp_outer)
+        sum_item = []
+        for node in self.nodes:
+            sum_item.append(node.cal_bethe(margin[node.name]))
 
-    def its_next_looplink(self):
-        target_node = self.leaf_nodes[self.itsbp_outer_cnt]
-
-        next_node = self.leaf_nodes[(
-            self.itsbp_outer_cnt + 1) % len(self.leaf_nodes)]
-
-        self.itsbp_outer_cnt = self.cfg.itsbp_schedule(
-            self.itsbp_outer_cnt, self.leaf_nodes)
-        return target_node, find_link(target_node, next_node)
-
-    def itsbp_outer_loop(self):
-        for _ in range(len(self.leaf_nodes)):
-            _, loop_link = self.its_next_looplink()
-            itsbp_inner_loop(loop_link, self.cfg.verbose_node_send_msg)
-
-    def parallel_message(self, run_constrained=True):
-        for target_var in self.varnode_recorder.values():
-            # sendind in messages from factors
-            target_var.sendin_message(self.cfg.verbose_node_send_msg)
-
-            if run_constrained or (not target_var.isconstrained):
-                target_var.sendout_message(self.cfg.verbose_node_send_msg)
+        return np.sum(sum_item)
