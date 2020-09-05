@@ -7,6 +7,9 @@ from cbp.configs.base_config import baseconfig
 
 
 class MsgGraph(ConstrainGraph):
+    """implement the basic msg passing schedule and itsbp methods
+    """
+
     def __init__(self, config=baseconfig):
         super().__init__()
         self.cfg = config

@@ -2,6 +2,9 @@ from .base_graph import BaseGraph
 
 
 class ConstrainGraph(BaseGraph):
+    """add attr constrained_name, store all constrained nodes
+    """
+
     def __init__(self):
         super().__init__()
         self.constrained_names = []

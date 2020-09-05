@@ -73,9 +73,9 @@ class TestMOTGraph(unittest.TestCase):
         self.assertTrue(npu.isequal(sep0.marginal(), np.array([0.2, 0.8])))
         self.assertTrue(npu.isequal(sep1.marginal(), np.array([0.24, 0.76])))
         self.assertTrue(npu.isequal(sep0.marginal(),
-                                    cluster.marginal_dims(["VarNode_000"])))
+                                    cluster.margin_vars(["VarNode_000"])))
         self.assertTrue(npu.isequal(sep1.marginal(),
-                                    cluster.marginal_dims(["VarNode_001"])))
+                                    cluster.margin_vars(["VarNode_001"])))
 
     def test_cgm2mot(self):
         cgm = six_node_graph()

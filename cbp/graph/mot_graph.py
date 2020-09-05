@@ -4,6 +4,9 @@ from .base_graph import BaseGraph
 
 class MOTGraph(MsgGraph):
     def __init__(self):
+        """
+        * ``varnode2mot` map: while cluster should be used to calculate maring of varnode
+        """
         self.varnode2mot = {}
         super().__init__()
 
@@ -18,7 +21,7 @@ class MOTGraph(MsgGraph):
         return BaseGraph.add_varnode(self, node)
 
     def register_var(self, mot_node):
-        for var_name in mot_node.list_name:
+        for var_name in mot_node.list_varname:
             if var_name not in self.varnode2mot:
                 self.varnode2mot[var_name] = mot_node
             else:
@@ -30,5 +33,5 @@ class MOTGraph(MsgGraph):
 
     def export_node_marginal(self):
         return {
-            name: node.marginal_dims([name]) for name,
+            name: node.margin_vars([name]) for name,
             node in self.varnode2mot.items()}

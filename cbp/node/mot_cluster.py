@@ -3,6 +3,12 @@ import cbp.utils.np_utils as npu
 
 
 class MOTCluster(MOTNode):
+    """Cluster node in the mot graph or junction graph.
+
+    We treat a contrained varnode as a cluster in the graph.
+    TODO: Do we need to consider the fixed factor node
+    """
+
     def __init__(self, connections, list_var, list_factor=[]):
         super().__init__(list_var, list_factor)
         if len(list_var) == 1 and list_var[0].isconstrained:
@@ -13,7 +19,7 @@ class MOTCluster(MOTNode):
         self.connections = connections
 
     def idx_dims(self, node):
-        return [self.list_name.index(name) for name in node.list_name]
+        return [self.list_varname.index(name) for name in node.list_varname]
 
     def make_message(self, recipient_node):
         if self.isconstrained:
@@ -31,7 +37,7 @@ class MOTCluster(MOTNode):
         return super().marginal()
 
     def plot(self, graph):
-        node_label = '\n'.join([self.name[3:], self.mot_name])
+        node_label = '\n'.join([self.name[3:], self.connected_varname])
         if self.isconstrained:
             graph.add_node(
                 self.name,
