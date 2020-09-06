@@ -9,8 +9,8 @@ class MOTCluster(MOTNode):
     TODO: Do we need to consider the fixed factor node
     """
 
-    def __init__(self, connections, list_var, list_factor=[]):
-        super().__init__(list_var, list_factor)
+    def __init__(self, connections, list_var, list_factor=[], potential=None):
+        super().__init__(list_var, list_factor, potential)
         if len(list_var) == 1 and list_var[0].isconstrained:
             self.isconstrained = True
             self.constrained_marginal = list_var[0].constrained_marginal
