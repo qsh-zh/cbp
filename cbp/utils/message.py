@@ -4,4 +4,5 @@ import numpy as np
 
 class Message(namedtuple('Message', ['sender', 'val'])):
     def __new__(cls, sender, val):
-        return super(Message, cls).__new__(cls, sender, val / np.sum(val))
+        val = np.clip(val / np.sum(val), 1e-12, None)
+        return super(Message, cls).__new__(cls, sender, val)

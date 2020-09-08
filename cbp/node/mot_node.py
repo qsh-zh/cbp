@@ -35,8 +35,8 @@ class MOTNode(MsgNode):
         self.rv_dim = len(list_var)
         self.list_factor = list_factor
         self.connected_varname = self.__parse_varname()
-        node_potential = potential if potential else \
-            construct_potential(list_var, list_factor)
+        node_potential = construct_potential(
+            list_var, list_factor) if potential is None else potential
         super().__init__(node_potential)
 
     def __parse_varname(self):
