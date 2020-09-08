@@ -47,7 +47,6 @@ setup(
         'scipy',
         'matplotlib',
         'seaborn',
-        'pygraphviz',
         'numba',
         'hmmlearn'
     ],
@@ -60,6 +59,7 @@ setup(
             'pylint',
             'pytest',
             'pytest-cov',
+            'pygraphviz'
         ]
     },
 )
