@@ -1,14 +1,15 @@
-from matplotlib.lines import Line2D
-import cbp.utils.np_utils as npu
-from cbp.node import VarNode, MOTCluster, MOTSeperator
-from cbp.graph import MOTGraph
-from scipy.ndimage import gaussian_filter1d
-import unittest
-import numpy as np
-from numba import jit
 from collections import namedtuple
-from mpl_toolkits.mplot3d import Axes3D
+
+import cbp.utils.np_utils as npu
 import matplotlib.pyplot as plt
+import numpy as np
+from cbp.graph import MOTGraph
+from cbp.node import MOTCluster, MOTSeperator, VarNode
+from matplotlib.lines import Line2D
+from mpl_toolkits.mplot3d import Axes3D
+from numba import jit
+from scipy.ndimage import gaussian_filter1d
+
 PLTLine = namedtuple('PLTLine', ['x', 'density', 'color'])
 
 
@@ -21,7 +22,7 @@ class VizDist:
     def add_line(self, x, density, color='blue'):
         self.lines.append(PLTLine(x / (self.num_sample - 1), density, color))
 
-    def plot(self, name='a.png'):
+    def plot(self, name='wasserstein_ls_sq.png'):
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         len_x = len(self.bin_locs)
@@ -109,8 +110,8 @@ class DistInterpolate:
         return rtn_dist
 
 
-class TestMotLeastSq(unittest.TestCase):
-    def init(self):
+class TestMotLeastSq:
+    def __init__(self):
         self.strength = 50000
         self.rng = np.random.RandomState(1)
         self.dim = 100 + 1
@@ -174,9 +175,7 @@ class TestMotLeastSq(unittest.TestCase):
         print("Finish build graph")
         return motgraph, random_leaf
 
-    @unittest.skip("Move it to example")
-    def test_run(self):
-        self.init()
+    def run(self):
         mot, x_array = self.constuct_graph()
         result = mot.itsbp()
         mot_node_marginal = mot.export_node_marginal()
@@ -191,3 +190,8 @@ class TestMotLeastSq(unittest.TestCase):
         self.viz.add_line(0, infer_start_dist, 'red')
         self.viz.add_line(self.num_sample - 1, infer_end_dist, 'red')
         self.viz.plot()
+
+
+if __name__ == "__main__":
+    wass_least_sq = TestMotLeastSq()
+    wass_least_sq.run()

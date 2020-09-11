@@ -3,3 +3,6 @@ branch = True
 
 [report]
 omit = cbp/builder/*.py
+exclude_lines =
+    pragma: no cover
+    raise RuntimeError

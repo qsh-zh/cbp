@@ -165,4 +165,5 @@ class BaseGraph():
             graph.layout(prog='neato')
             graph.draw(png_name)
         else:
-            raise ValueError("must have pygraphviz installed for visualization")
+            raise RuntimeError(
+                "must have pygraphviz installed for visualization")

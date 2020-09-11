@@ -8,7 +8,8 @@
 - [x] constrained cluster case
 - [x] orgnize the message passing
 - [x] remove the itsbp to high level
-- [ ] three components of the engine function
+- [x] three components of the engine function
+- [ ] GraphModel strange naming
 
 
 # CBP(Constrained Belief Propagation)
