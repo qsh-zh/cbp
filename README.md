@@ -10,6 +10,8 @@
 - [x] remove the itsbp to high level
 - [x] three components of the engine function
 - [ ] GraphModel strange naming
+- [ ] Add change logs
+- [ ] add docs link and codecov
 
 
 # CBP(Constrained Belief Propagation)
