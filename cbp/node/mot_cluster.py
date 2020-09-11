@@ -1,5 +1,6 @@
-from .mot_node import MOTNode
 import cbp.utils.np_utils as npu
+
+from .mot_node import MOTNode
 
 
 class MOTCluster(MOTNode):
@@ -9,7 +10,7 @@ class MOTCluster(MOTNode):
     TODO: Do we need to consider the fixed factor node
     """
 
-    def __init__(self, connections, list_var, list_factor=[], potential=None):
+    def __init__(self, connections, list_var, list_factor=None, potential=None):
         super().__init__(list_var, list_factor, potential)
         if len(list_var) == 1 and list_var[0].isconstrained:
             self.isconstrained = True

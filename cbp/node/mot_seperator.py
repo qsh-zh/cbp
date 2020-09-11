@@ -1,5 +1,6 @@
-from .mot_node import MOTNode
 import cbp.utils.np_utils as npu
+
+from .mot_node import MOTNode
 
 
 class MOTSeperator(MOTNode):

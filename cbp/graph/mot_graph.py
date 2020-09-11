@@ -28,7 +28,7 @@ class MOTGraph(MsgGraph):
                 if mot_node.rv_dim < self.varnode2mot[var_name].rv_dim:
                     self.varnode2mot[var_name] = mot_node
 
-    def delete_node(self):
+    def delete_node(self, name_str):
         pass
 
     def export_node_marginal(self):

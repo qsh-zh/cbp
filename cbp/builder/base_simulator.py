@@ -202,7 +202,7 @@ class TrajSimulator(ABC):
         """
 
     def observe_traj(self, traj):
-        rtn = np.zeros_like(traj,dtype=float)
+        rtn = np.zeros_like(traj, dtype=float)
         loop_iter = np.nditer(traj, flags=['multi_index'])
         for i in loop_iter:
             rtn[loop_iter.multi_index] = self.observe(i)

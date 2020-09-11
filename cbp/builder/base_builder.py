@@ -5,7 +5,6 @@ from numpy.random import RandomState
 from cbp.graph import GraphModel
 from cbp.node import VarNode, FactorNode
 
-from cbp.builder.potential_utils import diagonal_potential_different
 from .potential_utils import diagonal_potential, diagonal_potential_conv
 
 

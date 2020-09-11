@@ -3,9 +3,6 @@ from .base_hmmsim_builder import BaseHMMSimBuilder
 
 
 class HMMSimBuilder(BaseHMMSimBuilder):
-    def __init__(self, length, simulator, policy,
-                 random_seed=1):
-        super().__init__(length, simulator, policy, random_seed)
 
     def add_constrained_node(self, probability=None):
         prob = self.simulator.get_fix_margin(
@@ -19,5 +16,5 @@ class HMMSimBuilder(BaseHMMSimBuilder):
         self.graph.add_factornode(factornode)
         return factornode
 
-    def compare_acc(self):
+    def compare_acc(self):  # pylint: disable=arguments-differ
         return super().compare_acc(self.graph)

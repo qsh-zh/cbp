@@ -1,10 +1,10 @@
-from cbp.utils import (compare_marginals, diff_max_marginals,
-                       engine_loop)
+import numpy as np
+
+from cbp.utils import diff_max_marginals
 from cbp.configs.base_config import baseconfig
 from cbp.node import VarNode
 
 from .coef_policy import bp_policy
-from .graph_utils import itsbp_inner_loop, find_link
 from .discrete_graph import DiscreteGraph
 
 

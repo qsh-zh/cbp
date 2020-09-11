@@ -47,8 +47,9 @@ class GMOHMMSimulator(TrajSimulator):
         super().register_potential(ptype, potential)
 
     def observe_traj(self, traj):
-        rtn = np.zeros_like((traj.shape[0], traj.shape[1], self.obser_dim),
-                            traj, dtype=float)
+        rtn = np.zeros_like(
+            (traj.shape[0], traj.shape[1], getattr(
+                self, "obser_dim")), traj, float)
         loop_iter = np.nditer(traj, flags=['multi_index'])
         for i in loop_iter:
             rtn[loop_iter.multi_index] = self.observe(i)

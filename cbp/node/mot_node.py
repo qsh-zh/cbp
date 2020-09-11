@@ -1,6 +1,8 @@
-from .msg_node import MsgNode
-import cbp.utils.np_utils as npu
 import numpy as np
+
+import cbp.utils.np_utils as npu
+
+from .msg_node import MsgNode
 
 
 def construct_potential(list_var, list_factor):
@@ -21,11 +23,11 @@ def construct_potential(list_var, list_factor):
     return potential
 
 
-class MOTNode(MsgNode):
+class MOTNode(MsgNode):  # pylint: disable= abstract-method
     """node in mot graph, junction graph
     """
 
-    def __init__(self, list_var, list_factor=[], potential=None):
+    def __init__(self, list_var, list_factor=None, potential=None):
         """
         * ``rv_dim`` int: number of varnodes in the mot_node
 
@@ -33,11 +35,12 @@ class MOTNode(MsgNode):
         self.list_var = list_var
         self.list_varname = [node.name for node in list_var]
         self.rv_dim = len(list_var)
-        self.list_factor = list_factor
+        self.list_factor = list_factor if list_factor is not None else []
         self.connected_varname = self.__parse_varname()
         node_potential = construct_potential(
-            list_var, list_factor) if potential is None else potential
+            list_var, self.list_factor) if potential is None else potential
         super().__init__(node_potential)
+        self.cached_marginal = None
 
     def __parse_varname(self):
         connected_vars = []
@@ -61,7 +64,7 @@ class MOTNode(MsgNode):
 
     def margin_vars(self, name_vars):
         dims = [self.list_varname.index(name) for name in name_vars]
-        if not hasattr(self, 'cached_marginal'):
+        if self.cached_marginal is None:
             marginal = self.marginal()
         else:
             marginal = self.cached_marginal

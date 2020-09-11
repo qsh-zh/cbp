@@ -1,9 +1,9 @@
-from .constrain_graph import ConstrainGraph
-from cbp.utils import (compare_marginals, diff_max_marginals,
-                       engine_loop, Message)
-
-from .graph_utils import itsbp_inner_loop, find_link
 from cbp.configs.base_config import baseconfig
+from cbp.utils import (Message, compare_marginals, diff_max_marginals,
+                       engine_loop)
+
+from .constrain_graph import ConstrainGraph
+from .graph_utils import find_link, itsbp_inner_loop
 
 
 class MsgGraph(ConstrainGraph):

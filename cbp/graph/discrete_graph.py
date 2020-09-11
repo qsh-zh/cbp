@@ -1,15 +1,13 @@
 from functools import partial
 
 import numpy as np
-from cbp.utils import (Message, diff_max_marginals,
-                       engine_loop)
-from cbp.utils.np_utils import (nd_expand, nd_multiexpand,
-                                nd_reduce)
-from .coef_policy import bp_policy
-from .graph_utils import cal_marginal_from_tensor
+from cbp.configs.base_config import baseconfig
+from cbp.utils import diff_max_marginals, engine_loop
+from cbp.utils.np_utils import nd_expand, nd_multiexpand, nd_reduce
 
 from .cnp_graph import CnpGraph
-from cbp.configs.base_config import baseconfig
+from .coef_policy import bp_policy
+from .graph_utils import cal_marginal_from_tensor
 
 
 class DiscreteGraph(CnpGraph):

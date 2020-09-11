@@ -7,7 +7,7 @@ from .var_node import VarNode
 class GOVarNode(BaseNode):
     def __init__(self, bins):
         self.bins = bins
-        self.is_multi = True if bins.ndim > 1 else False
+        self.is_multi = bins.ndim > 1
         super().__init__()
 
     def discrete(self):

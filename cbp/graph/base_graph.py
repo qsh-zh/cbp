@@ -105,10 +105,10 @@ class BaseGraph():
         """
         if name_str in self.varnode_recorder:
             return self.varnode_recorder[name_str]
-        elif name_str in self.factornode_recorder:
+        if name_str in self.factornode_recorder:
             return self.factornode_recorder[name_str]
-        else:
-            raise RuntimeError(f"{name_str} is illegal, not in this graph")
+
+        raise RuntimeError(f"{name_str} is illegal, not in this graph")
 
     def delete_node(self, name_str):
         """delete node from graph, needs to check following

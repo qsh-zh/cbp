@@ -24,5 +24,5 @@ class HMMGOSimBuilder(BaseHMMSimBuilder):
         self.graph.add_factornode(factornode)
         return factornode
 
-    def compare_acc(self):
+    def compare_acc(self):  # pylint: disable=arguments-differ
         return super().compare_acc(self.graph.discrete_graph)
