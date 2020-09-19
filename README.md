@@ -77,3 +77,9 @@ In CBP framework, we present a nice elegant connections between multi-marginal o
 }
 ```
 
+## Changes
+
+### 0.3.0
+
+* Start with `0.3.0`. Add MOT algorithm for inference in cyclic graph.
+* All older version is compatible with `0.2.x`, but may cause issue in `0.3`.
