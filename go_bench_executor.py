@@ -8,7 +8,7 @@ class GOBenchExecutor(_Drawer):
         self.cfg = cfg
         sim = self.construct_sim()
         self.drawer_path = self.cfg.pkl_path()
-        self._draw_name = self.cfg.pkl_name()
+        self._drawer_name = self.cfg.pkl_name()
         self.exp_record = {}
         self.builder = self.construct_builder(sim)
 
