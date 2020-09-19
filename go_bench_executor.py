@@ -1,3 +1,5 @@
+import numpy as np
+
 from cbp.builder import GOHMMSimulator, HMMGOSimBuilder, PotentialType
 from cbp.graph import bp_policy
 from paperkit import _Drawer
@@ -11,6 +13,7 @@ class GOBenchExecutor(_Drawer):
         self._drawer_name = self.cfg.pkl_name()
         self.exp_record = {}
         self.builder = self.construct_builder(sim)
+        self.gt_margin = sim.record["gt_margin"]
 
     def construct_sim(self):
         sim = GOHMMSimulator(
@@ -37,8 +40,16 @@ class GOBenchExecutor(_Drawer):
         _, step, timer = disc_graph.run_bp()
         self.exp_record["step"] = step
         self.exp_record["time"] = timer[-1]
+        self.exp_record["record_KL"] = [
+            self.norm1(item) for item in disc_graph.record_KL]
 
         self.save()
+
+    def norm1(self, marginal):
+        matrix_margin = []
+        for i in range(self.cfg.hmm_length):
+            matrix_margin.append(marginal[f"VarNode_{2*i:03d}"])
+        return np.sum(abs(np.stack(matrix_margin) - self.gt_margin))
 
 
 if __name__ == "__main__":

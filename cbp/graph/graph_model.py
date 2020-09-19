@@ -13,6 +13,7 @@ class GraphModel(DiscreteGraph):
         super().__init__(coef_policy=coef_policy)
         self.cfg = config
         self.itsbp_outer_cnt = 0
+        self.record_KL = []
 
     def add_varnode(self, node):
         """ add check node type and call parent checker
@@ -78,6 +79,7 @@ class GraphModel(DiscreteGraph):
         :rtype: [type]
         """
         self.first_belief_propagation()
+        self.record_KL.append(self.export_convergence_marginals())
         return self.engine_loop(self.itsbp_outer_loop,
                                 tolerance=self.cfg.itsbp_outer_tolerance,
                                 error_fun=diff_max_marginals,
@@ -97,6 +99,7 @@ class GraphModel(DiscreteGraph):
         for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
             itsbp_inner_loop(loop_link, self.cfg.verbose_node_send_msg)
+        self.record_KL.append(self.export_convergence_marginals())
 
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():

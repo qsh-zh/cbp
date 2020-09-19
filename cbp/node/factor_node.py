@@ -145,7 +145,8 @@ class FactorNode(DiscreteNode):
 
     def cal_bethe(self, margin):
         clip_potential = np.clip(self.potential, 1e-12, None)
-        return np.sum(margin * np.log(margin / clip_potential))
+        log_item = np.clip(margin / clip_potential, 1e-12, None)
+        return np.sum(margin * log_item)
 
     def marginal(self):
         message_val = np.array([message.val for message in self.latest_message])
