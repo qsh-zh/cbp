@@ -27,7 +27,7 @@ def KL_draw(cmds):
         ax.plot(x, kl)
 
     ax.set_xlabel("Iteration Step")
-    ax.set_ylabel("Sum of L1 Error")
+    ax.set_ylabel("L1 Error")
     ax.set_yscale("log")
     fig.savefig("error.png")
 
