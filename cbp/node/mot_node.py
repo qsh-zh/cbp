@@ -4,6 +4,8 @@ import cbp.utils.np_utils as npu
 
 from .msg_node import MsgNode
 
+from typing import List
+
 
 def construct_potential(list_var, list_factor):
     """construct the potential of mot node
@@ -36,6 +38,7 @@ class MOTNode(MsgNode):  # pylint: disable= abstract-method
         self.list_varname = [node.name for node in list_var]
         self.rv_dim = len(list_var)
         self.list_factor = list_factor if list_factor is not None else []
+        # TODO: check whether or not do we need the list_factor?
         self.connected_varname = self.__parse_varname()
         node_potential = construct_potential(
             list_var, self.list_factor) if potential is None else potential
@@ -62,7 +65,14 @@ class MOTNode(MsgNode):  # pylint: disable= abstract-method
         setattr(self, 'cached_marginal', marginal)
         return marginal
 
-    def margin_vars(self, name_vars):
+    def margin_vars(self, name_vars: List(str)):
+        """calculate from joint vars to marginal of requested vars
+
+        :param name_vars: [description]
+        :type name_vars: List
+        :return: [description]
+        :rtype: [type]
+        """
         dims = [self.list_varname.index(name) for name in name_vars]
         if self.cached_marginal is None:
             marginal = self.marginal()

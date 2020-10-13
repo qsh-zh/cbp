@@ -99,6 +99,7 @@ class MsgNode(BaseNode):
         :type verbose: bool, optional
         """
         val = self.make_message(recipient_node)
+        assert val.shape == recipient_node.potential.shape
         message = Message(self, val)
         recipient_node.store_message(message)
         if verbose:
