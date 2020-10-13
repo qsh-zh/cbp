@@ -35,3 +35,10 @@ class MOTGraph(MsgGraph):
         return {
             name: node.margin_vars([name]) for name,
             node in self.varnode2mot.items()}
+
+    def minimization(self, margianl=None):
+        if margianl is None:
+            margianl = {name: None for name in self.factornode_recorder.keys()}
+        value = sum([self.factornode_recorder[name].minimization(cur_marginal)
+                     for name, cur_marginal in margianl.items()])
+        return value

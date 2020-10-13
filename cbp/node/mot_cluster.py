@@ -1,3 +1,5 @@
+import numpy as np
+
 import cbp.utils.np_utils as npu
 
 from .mot_node import MOTNode
@@ -6,8 +8,11 @@ from .mot_node import MOTNode
 class MOTCluster(MOTNode):
     """Cluster node in the mot graph or junction graph.
 
+    - connection -> which seperators to connect
+    - isconstrained -> whether or not the cluster is from a constrained VarNode
+
     We treat a contrained varnode as a cluster in the graph.
-    TODO: Do we need to consider the fixed factor node
+    TODO: Do we need to consider the fixed factor node?
     """
 
     def __init__(self, connections, list_var, list_factor=None, potential=None):
@@ -54,3 +59,10 @@ class MOTCluster(MOTNode):
 
         for node in self.connected_nodes.values():
             graph.add_edge(self.name, node.name, color='black')
+
+    def minimization(self, marginal=None):
+        if self.isconstrained:
+            return 0
+        marginal = self.marginal() if marginal is None else marginal
+        clip_potential = np.clip(self.potential, 1e-12, None)
+        return np.sum(marginal * np.log(clip_potential))
