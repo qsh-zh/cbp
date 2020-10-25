@@ -1,14 +1,15 @@
 from .msg_graph import MsgGraph
 from .base_graph import BaseGraph
+from cbp.configs.base_config import baseconfig
 
 
 class MOTGraph(MsgGraph):
-    def __init__(self):
+    def __init__(self, cfg=baseconfig):
         """
         * ``varnode2mot` map: while cluster should be used to calculate maring of varnode
         """
         self.varnode2mot = {}
-        super().__init__()
+        super().__init__(cfg)
 
     def add_cluster(self, node):
         node_name = self.add_factornode(node)

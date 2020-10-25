@@ -43,6 +43,7 @@ class MsgGraph(ConstrainGraph):
         """
         self.first_belief_propagation()
         return self.engine_loop(self.itsbp_outer_loop,
+                                max_iter=self.cfg.itsbp_outer_iteration,
                                 tolerance=self.cfg.itsbp_outer_tolerance,
                                 error_fun=diff_max_marginals,
                                 isoutput=self.cfg.verbose_itsbp_outer)
@@ -60,7 +61,12 @@ class MsgGraph(ConstrainGraph):
     def itsbp_outer_loop(self):
         for _ in range(len(self.leaf_nodes)):
             _, loop_link = self.its_next_looplink()
-            itsbp_inner_loop(loop_link, self.cfg.verbose_node_send_msg)
+            if self.cfg.verbose_itsbp_link:
+                print(loop_link[0], loop_link[-1])
+            itsbp_inner_loop(
+                loop_link,
+                self.cfg.verbose_send_msg_name,
+                self.cfg.verbose_send_msg_data)
 
     def export_marginals(self):
         """export the marginal for variable nodes
@@ -125,10 +131,12 @@ class MsgGraph(ConstrainGraph):
     def parallel_message(self, run_constrained=True):
         for target_var in self.varnode_recorder.values():
             # sendind in messages from factors
-            target_var.sendin_message(self.cfg.verbose_node_send_msg)
+            target_var.sendin_message(self.cfg.verbose_send_msg_name,
+                                      self.cfg.verbose_send_msg_data)
 
             if run_constrained or (not target_var.isconstrained):
-                target_var.sendout_message(self.cfg.verbose_node_send_msg)
+                target_var.sendout_message(self.cfg.verbose_send_msg_name,
+                                           self.cfg.verbose_send_msg_data)
 
     def copy_bp_initialization(self, another_graph):
         """copy message setup from the another graph has same structure

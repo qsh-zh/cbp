@@ -65,7 +65,7 @@ class MOTNode(MsgNode):  # pylint: disable= abstract-method
         setattr(self, 'cached_marginal', marginal)
         return marginal
 
-    def margin_vars(self, name_vars: List(str)):
+    def margin_vars(self, name_vars: List[str]):
         """calculate from joint vars to marginal of requested vars
 
         :param name_vars: [description]

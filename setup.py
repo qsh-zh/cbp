@@ -59,7 +59,8 @@ setup(
             'pylint',
             'pytest',
             'pytest-cov',
-            'pygraphviz'
+            'pygraphviz',
+            'POT'
         ]
     },
 )

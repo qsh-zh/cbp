@@ -65,18 +65,16 @@ class MsgNode(BaseNode):
 
     def prod2node(self, recipient_node):
         latest_message = self.latest_message
-        filtered_message = [message for message in latest_message
+        filtered_message = [message.val for message in latest_message
                             if not message.sender.name == recipient_node.name]
 
-        message_val = np.array([message.val for message in filtered_message])
-
-        prod_messages = np.prod(message_val, axis=0)
+        prod_messages = np.prod(filtered_message, axis=0)
 
         product_out = np.multiply(self.potential, prod_messages)
         return product_out
 
     def prodmsg(self):
-        message_val = np.array([message.val for message in self.latest_message])
+        message_val = [message.val for message in self.latest_message]
         prod_messages = np.prod(message_val, axis=0)
         return np.multiply(self.potential, prod_messages)
 
@@ -91,7 +89,11 @@ class MsgNode(BaseNode):
         :rtype: np.ndarray
         """
 
-    def send_message(self, recipient_node, verbose=False):
+    def send_message(
+            self,
+            recipient_node,
+            verbose_name=False,
+            verbose_data=False):
         """send message from this node to target node
 
         :param recipient_node: target node
@@ -102,17 +104,20 @@ class MsgNode(BaseNode):
         assert val.shape == recipient_node.potential.shape
         message = Message(self, val)
         recipient_node.store_message(message)
-        if verbose:
+        if verbose_name:
             print(self.name + '->' + recipient_node.name)
+        if verbose_data:
             print(message.val)
 
-    def sendin_message(self, verbose=False):
+    def sendin_message(self, verbose_name=False,
+                       verbose_data=False):
         for connected_node in self.connected_nodes.values():
-            connected_node.send_message(self, verbose)
+            connected_node.send_message(self, verbose_name, verbose_data)
 
-    def sendout_message(self, verbose=False):
+    def sendout_message(self, verbose_name=False,
+                        verbose_data=False):
         for connected_node in self.connected_nodes.values():
-            self.send_message(connected_node, verbose)
+            self.send_message(connected_node, verbose_name, verbose_data)
 
     def search_msg_index(self, message_list, node_name):
         which_index = [i for i, message in enumerate(message_list)
